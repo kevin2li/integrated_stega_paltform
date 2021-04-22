@@ -158,3 +158,4 @@ def image_to_base64(image_path:str):
 async def sure(q:Q):
     q.page['meta'].dialog = None
     await q.page.save()
+

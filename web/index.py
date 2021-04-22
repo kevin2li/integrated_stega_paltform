@@ -10,13 +10,48 @@ from web.imgae_steganalysis import *
 from web.text_steganography import *
 from web.text_steganalysis import *
 from web.download_section import *
+
+
+first_level_menu = {
+    'menu/index': '首页',
+    'menu/image_stega': '图像隐写',
+    'menu/image_steganalysis': '图像隐写分析',
+    'menu/text_stega': '文本隐写',
+    'menu/text_steganalysis': '文本隐写分析',
+    'menu/download_section': '文本隐写分析',
+}
+first_level_help = {
+    'help/about': '关于',
+    'help/support': '支持',
+}
+
 #================================================================
 # 首页
 #================================================================
+async def reset(q:Q):
+    if not q.client.initialized:
+        await menu_index(q)
+
 @app('/')
 async def serve(q:Q):
     ic(q.args)
-    # ic(vars(q.page))
+    # ic(vars(q.page['tab_bar'].tab_bar))
+    ic(q.client.initialized)
+    location = q.args['#']
+    ic(location)
+    if location:
+        location = location.replace('/', '_')
+        await eval(location)(q)
+    elif not str(q.args):
+        location = 'menu_index'
+        await eval(location)(q)
+    else:
+        await handle_on(q)
+#================================================================
+# 菜单项
+#================================================================
+@on(arg='#menu/index')
+async def menu_index(q:Q):
     if not q.client.initialized:
         q.page['meta'] = layout1
         q.page['header'] = ui.header_card(
@@ -26,62 +61,46 @@ async def serve(q:Q):
             subtitle='Integrated Steganography/Steganalysis platform',
         )
         q.page['tab_bar'] = ui.tab_card(box='tab_bar', items=[
-            ui.tab('image_stega', '图像隐写'),
-            ui.tab('image_steganalysis', '图像隐写分析'),
-            ui.tab('text_stega', '文本隐写'),
-            ui.tab('text_steganalysis', '文本隐写分析'),
-            ui.tab('#menu/download_section', '下载专区'),
+            # ui.tab('image_stega', '图像隐写'),
+            # ui.tab('image_steganalysis', '图像隐写分析'),
+            # ui.tab('text_stega', '文本隐写'),
+            # ui.tab('text_steganalysis', '文本隐写分析'),
+            # ui.tab('#menu/download_section', '下载专区'),
         ])
         q.page['v_nav'] = ui.nav_card(
             box=ui.box('sidebar', height='100%'),
             value='#menu/index',
             items=[
                 ui.nav_group('Menu', items=[
-                    ui.nav_item(name='#menu/index', label='首页'),
-                    ui.nav_item(name='#menu/image_stega', label='图像隐写'),
-                    ui.nav_item(name='#menu/image_steganalysis', label='图像隐写分析'),
-                    ui.nav_item(name='#menu/text_stega', label='文本隐写'),
-                    ui.nav_item(name='#menu/text_steganalysis', label='文本隐写分析'),
-                    ui.nav_item(name='#menu/download_section', label='下载专区'),
+                    ui.nav_item(name=f'#{k}', label=v) for k, v in first_level_menu.items()
                 ]),
                 ui.nav_group('帮助', items=[
-                    ui.nav_item(name='#help/about', label='关于'),
-                    ui.nav_item(name='#help/support', label='支持'),
+                    ui.nav_item(name=f'#{k}', label=v) for k, v in first_level_help.items()
                 ])
             ],
         )
         q.page['content'] = ui.form_card(box='content', items=[
             ui.text('正在开发中...')
         ])
-        q.page['footer'] = ui.footer_card(box='footer', caption='江苏省南京市宁六路219号')
         q.client.initialized = True
         await q.page.save()
     else:
-        await handle_on(q)
-        
-#================================================================
-# 菜单项
-#================================================================
-@on(arg='#menu/index')
-async def serve(q:Q):
-    empty(q)
-    q.page['meta'] = layout1
-    q.page['v_nav'].value = '#menu/index'
-    q.page['tab_bar'] = ui.tab_card(box='tab_bar', items=[
-        ui.tab('image_stega', '图像隐写'),
-        ui.tab('image_steganalysis', '图像隐写分析'),
-        ui.tab('text_stega', '文本隐写'),
-        ui.tab('text_steganalysis', '文本隐写分析'),
-        ui.tab('#menu/download_section', '下载专区'),
-    ])
-    q.page['content'] = ui.form_card(box='content', items=[
-        ui.text('正在开发中...')
-    ])
-    await q.page.save()
+        q.page['v_nav'].value = '#menu/index'
+        q.page['tab_bar'] = ui.tab_card(box='tab_bar', items=[
+            # ui.tab('image_stega', '图像隐写'),
+            # ui.tab('image_steganalysis', '图像隐写分析'),
+            # ui.tab('text_stega', '文本隐写'),
+            # ui.tab('text_steganalysis', '文本隐写分析'),
+            # ui.tab('#menu/download_section', '下载专区'),
+        ])
+        q.page['content'] = ui.form_card(box='content', items=[
+            ui.text('正在开发中...')
+        ])
+        await q.page.save()
 
 @on(arg='#menu/image_stega')
-async def serve(q:Q):
-    empty(q)
+async def menu_image_stega(q:Q):
+    await reset(q)
     q.page['meta'] = layout1
     q.page['v_nav'].value = '#menu/image_stega'
     q.page['tab_bar'] = ui.tab_card(box='tab_bar', items=[
@@ -95,7 +114,8 @@ async def serve(q:Q):
     await q.page.save()
 
 @on(arg='#menu/image_steganalysis')
-async def serve(q:Q):
+async def menu_image_steganalysis(q:Q):
+    await reset(q)
     empty(q)
     q.page['meta'] = layout1
     q.page['v_nav'].value = '#menu/image_steganalysis'
@@ -107,8 +127,8 @@ async def serve(q:Q):
     await image_instance_level(q)
 
 @on(arg='#menu/text_stega')
-async def serve(q:Q):
-    empty(q)
+async def menu_text_stega(q:Q):
+    await reset(q)
     q.page['meta'] = layout1
     q.page['v_nav'].value = '#menu/text_stega'
     q.page['tab_bar'] = ui.tab_card(box='tab_bar', items=[
@@ -121,7 +141,8 @@ async def serve(q:Q):
     await q.page.save()
 
 @on(arg='#menu/text_steganalysis')
-async def serve(q:Q):
+async def menu_text_steganalysis(q:Q):
+    await reset(q)
     empty(q)
     q.page['meta'] = layout1
     q.page['v_nav'].value = '#menu/text_steganalysis'
@@ -135,8 +156,8 @@ async def serve(q:Q):
     await q.page.save()
 
 @on(arg='#menu/download_section')
-async def serve(q:Q):
-    empty(q)
+async def menu_download_section(q:Q):
+    await reset(q)
     q.page['meta'] = layout1
     q.page['v_nav'].value = '#menu/download_section'
     q.page['tab_bar'] = ui.tab_card(box='tab_bar', items=[
@@ -149,21 +170,30 @@ async def serve(q:Q):
     await q.page.save()
 
 @on(arg='#help/about')
-async def serve(q:Q):
-    empty(q)
+async def help_about(q:Q):
+    await reset(q)
     q.page['meta'] = layout1
     q.page['v_nav'].value = '#help/about'
+    q.page['tab_bar'] = ui.tab_card(box='tab_bar', items=[
+        
+    ])
     q.page['content'] = ui.form_card(box='content', items=[
         ui.text('正在开发中...')
     ])
     await q.page.save()
 
 @on(arg='#help/support')
-async def serve(q:Q):
-    empty(q)
+async def help_support(q:Q):
+    await reset(q)
     q.page['meta'] = layout1
     q.page['v_nav'].value = '#help/support'
+    q.page['tab_bar'] = ui.tab_card(box='tab_bar', items=[
+
+    ])
     q.page['content'] = ui.form_card(box='content', items=[
         ui.text('正在开发中...')
     ])
     await q.page.save()
+
+
+
