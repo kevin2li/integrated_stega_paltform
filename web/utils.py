@@ -47,7 +47,8 @@ layout1 = ui.meta_card(box='', title='集成隐写/分析平台', layouts=[
               ),
               ui.layout(
                   breakpoint='xl',
-                  width='1200px',
+                  width='80%',
+                  height='100%',
                   zones=[
                       ui.zone('header'),
                       ui.zone('body', direction=ui.ZoneDirection.ROW, zones=[
@@ -105,7 +106,7 @@ layout2 = ui.meta_card(box='', title='集成隐写/分析平台', layouts=[
                 ),
                 ui.layout(
                     breakpoint='xl',
-                    width='1200px',
+                    width='80%',
                     zones=[
                         ui.zone('header'),
                         ui.zone('body', direction=ui.ZoneDirection.ROW, zones=[
@@ -153,7 +154,7 @@ def image_to_base64(image_path:str):
     base64_str = base64.b64encode(byte_data)
     return base64_str
 
-@on(arg='sure')
-async def serve(q:Q):
+@on()
+async def sure(q:Q):
     q.page['meta'].dialog = None
     await q.page.save()

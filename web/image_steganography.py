@@ -1,7 +1,7 @@
 import os
 import sys
 sys.path.append(os.path.abspath('..'))
-
+from pathlib import Path
 from h2o_wave import Q, app, handle_on, main, on, ui
 from icecream import ic
 from web.utils import layout1, layout2, empty
@@ -10,8 +10,8 @@ import bwm
 #================================================================
 # 图像隐写
 #================================================================
-@on(arg='image_stega')
-async def serve(q:Q):
+@on()
+async def image_stega(q:Q):
     empty(q)
     q.page['meta'] = layout1
     q.page['v_nav'].value = '#menu/steganography'
@@ -26,8 +26,8 @@ async def serve(q:Q):
 #================================================================
 # 数字水印
 #================================================================
-@on(arg='image_watermark')
-async def serve(q:Q):
+@on()
+async def image_watermark(q:Q):
     q.page['meta'] = layout1
     del q.page['content']
     ic(q.args)
@@ -48,12 +48,14 @@ async def serve(q:Q):
     ])
     await q.page.save()
 
-@on(arg='origin')
-async def serve(q:Q):
+@on()
+async def origin(q:Q):
     q.page['meta'] = layout1
     origin_path = q.args['origin']
     if origin_path:
-        origin_local_path = await q.site.download(origin_path[0], './upload')
+        save_dir = Path('./upload')
+        save_dir.mkdir(parents=True, exist_ok=True)
+        origin_local_path = await q.site.download(origin_path[0], str(save_dir))
         ic(origin_local_path)
         q.client.origin_path = origin_local_path
         q.page['upload'] = ui.form_card(box=ui.box('content', order=2, height='400px'), title='', items=[
@@ -70,12 +72,14 @@ async def serve(q:Q):
 
     await q.page.save()
 
-@on(arg='watermark')
-async def serve(q:Q):
+@on()
+async def watermark(q:Q):
     q.page['meta'] = layout1
     watermark_path = q.args['watermark']
     if watermark_path:
-        watermark_local_path = await q.site.download(watermark_path[0], './upload')
+        save_dir = Path('./upload')
+        save_dir.mkdir(parents=True, exist_ok=True)
+        watermark_local_path = await q.site.download(watermark_path[0], str(save_dir))
         q.client.watermark_path = watermark_local_path
         q.page['upload'] = ui.form_card(box=ui.box('content', order=2, height='400px'), title='', items=[
             ui.stepper(name='stepper', items=[
@@ -90,19 +94,20 @@ async def serve(q:Q):
         ])
     await q.page.save()
 
-@on(arg='start_embed')
-async def serve(q:Q):
+@on()
+async def start_embed(q:Q):
     q.page['meta'] = layout1
     ic(q.client.origin_path, q.client.watermark_path)
     if q.client.origin_path and q.client.watermark_path:
         bwm1 = bwm.watermark(4399,2333,36,20)
         bwm1.read_ori_img(q.client.origin_path)
         bwm1.read_wm(q.client.watermark_path)
-        embed_path = './upload/watermarked.png'
-        bwm1.embed(embed_path)
+        save_dir = Path('./upload')
+        embed_path = save_dir / 'watermarked.png'
+        bwm1.embed(str(embed_path))
         # image = image_to_base64(embed_path).decode()
         # q.page['embedding'] = ui.image_card(box='content', title='嵌入水印后',image=image, type='png')
-        download_path, = await q.site.upload(['/home/kevin2li/wave/myapps/upload/watermarked.png'])
+        download_path, = await q.site.upload([str(embed_path)])
         del q.client.origin_path
         del q.client.watermark_path
         ic(download_path)
@@ -124,8 +129,8 @@ async def serve(q:Q):
         ])
     await q.page.save()
 
-@on(arg='extract')
-async def serve(q:Q):
+@on()
+async def extract(q:Q):
     q.page['meta'] = layout1
     q.page['upload'] = ui.form_card(box=ui.box('content', order=2, height='500px'), title='', items=[
         ui.text('1.输入水印大小:'),
@@ -138,8 +143,8 @@ async def serve(q:Q):
     ])
     await q.page.save()
 
-@on(arg='watermarked')
-async def serve(q:Q):
+@on()
+async def watermarked(q:Q):
     q.page['meta'] = layout1
     w, h, watermarked_path = q.args['width'], q.args['height'], q.args['watermarked']
     watermarked_path = q.site.download(watermarked_path[0], './upload')

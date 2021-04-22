@@ -9,8 +9,8 @@ from web.utils import layout1, layout2, empty
 #================================================================
 # 文本隐写
 #================================================================
-@on(arg='text_stega')
-async def serve(q:Q):
+@on()
+async def text_stega(q:Q):
     del q.page['content_left1']
     del q.page['content_left2']
     empty(q)

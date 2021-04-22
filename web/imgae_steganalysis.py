@@ -11,18 +11,11 @@ models = {'YedNet': YedNet, 'ZhuNet': ZhuNet}
 #================================================================
 # 图像隐写分析
 #================================================================
-@on(arg='image_steganalysis')
-async def serve(q:Q):
-    del q.page['content_left']
+@on()
+async def image_instance_level(q:Q):
     q.page['meta'] = layout2
-    q.page['v_nav'].value = '#menu/steganalysis'
-    q.page['content_left1'] = ui.tab_card(box=ui.box('content_left', order=1, height='50px'), link=True, items=[
-        ui.tab('image_steganalysis', '单张图片检测'),
-        ui.tab('dataset_level', '数据集检测'),
-    ])
-    q.page['content_right1'] = ui.tab_card(box=ui.box('content_right', order=1, height='50px'), link=True, items=[
-
-    ])
+    q.page['v_nav'].value = '#menu/image_steganalysis'
+    del q.page['content_left']
     ic(q.client.instance_level)
     if not q.client.instance_level:
         q.page['content_left2'] = ui.form_card(box=ui.box('content_left', order=2, height='550px'), title='Inputs', items=[
@@ -46,8 +39,8 @@ async def serve(q:Q):
     await q.page.save()
 
 
-@on(arg='dataset_level')
-async def serve(q:Q):
+@on()
+async def image_dataset_level(q:Q):
     q.client.instance_level = False
     del q.page['content_left2']
     q.page['content_left'] = ui.form_card(box=ui.box('content_left', order=2, height='550px'), title='Inputs', items=[
@@ -57,8 +50,8 @@ async def serve(q:Q):
     ])
     await q.page.save()
 
-@on(arg='suspect_img')
-async def serve(q:Q):
+@on()
+async def suspect_img(q:Q):
     path = q.args['suspect_img']
     if path:
         local_path = await q.site.download(path[0], './upload')
@@ -68,8 +61,8 @@ async def serve(q:Q):
         ic(vars(q.page))
     await q.page.save()
 
-@on(arg='start_analysis')
-async def serve(q:Q):
+@on()
+async def start_analysis(q:Q):
     suspect_img_path = q.client.suspect_img_path
     checklist = q.args['checklist']
     ic(suspect_img_path)

@@ -9,8 +9,8 @@ from web.utils import layout1, layout2, empty
 #================================================================
 # 文本隐写分析
 #================================================================
-@on(arg='text_steganalysis')
-async def serve(q:Q):
+@on()
+async def text_steganalysis(q:Q):
     del q.page['content_left1']
     del q.page['content_left2']
     q.page['meta'] = layout2

@@ -4,8 +4,12 @@ sys.path.append(os.path.abspath('..'))
 
 from h2o_wave import Q, app, handle_on, main, on, ui
 from icecream import ic
-from web.utils import layout1, layout2, empty
-
+from web.utils import *
+from web.image_steganography import *
+from web.imgae_steganalysis import *
+from web.text_steganography import *
+from web.text_steganalysis import *
+from web.download_section import *
 #================================================================
 # 首页
 #================================================================
@@ -29,7 +33,7 @@ async def serve(q:Q):
             ui.tab('#menu/download_section', '下载专区'),
         ])
         q.page['v_nav'] = ui.nav_card(
-            box=ui.box('sidebar', height='500px'),
+            box=ui.box('sidebar', height='100%'),
             value='#menu/index',
             items=[
                 ui.nav_group('Menu', items=[
@@ -96,14 +100,11 @@ async def serve(q:Q):
     q.page['meta'] = layout1
     q.page['v_nav'].value = '#menu/image_steganalysis'
     q.page['tab_bar'] = ui.tab_card(box='tab_bar', items=[
-        ui.tab('text_instance_level', '单样本分析'),
-        ui.tab('image_stega', '数据集分析'),
+        ui.tab('image_instance_level', '单样本分析'),
+        ui.tab('image_dataset_level', '数据集分析'),
     ])
-    q.page['content'] = ui.form_card(box='content', items=[
-        ui.text('正在开发中...')
-    ])
-    await q.page.save()
-
+    q.args['image_instance_level'] = True
+    await image_instance_level(q)
 
 @on(arg='#menu/text_stega')
 async def serve(q:Q):
