@@ -7,22 +7,46 @@ import base64
 from io import BytesIO
 import bwm
 import imutils
+from src.models import YedNet, ZhuNet
+import torchvision.transforms as T
+import torch.nn.functional as F
+from src.datasetmgr import getDataLoader
+from src.config import args
+trainloader, testloader = getDataLoader(args)
 
 #================================================================
 # 变量声明
 #================================================================
-layout1 = ui.meta_card(box='', layouts=[
+layout1 = ui.meta_card(box='', title='集成隐写/分析平台', layouts=[
               ui.layout(
                   breakpoint='xs',
+                  width='100%',
                   zones=[
-                      # Add zones here.
-                  ],
+                      ui.zone('header'),
+                      ui.zone('body', direction=ui.ZoneDirection.ROW, zones=[
+                          ui.zone('sidebar', size='25%'),
+                          ui.zone('body', size='75%', direction=ui.ZoneDirection.COLUMN, zones=[
+                              ui.zone('tab_bar', size='15%'),
+                              ui.zone('content', size='85%', direction=ui.ZoneDirection.COLUMN)
+                          ]),
+                      ]),
+                      ui.zone('footer'),
+                  ]
               ),
               ui.layout(
                   breakpoint='m',
+                  width='100%',
                   zones=[
-                      # Add zones here.
-                  ],
+                      ui.zone('header'),
+                      ui.zone('body', direction=ui.ZoneDirection.ROW, zones=[
+                          ui.zone('sidebar', size='25%'),
+                          ui.zone('body', size='75%', direction=ui.ZoneDirection.COLUMN, zones=[
+                              ui.zone('tab_bar', size='15%'),
+                              ui.zone('content', size='85%', direction=ui.ZoneDirection.COLUMN)
+                          ]),
+                      ]),
+                      ui.zone('footer'),
+                  ]
               ),
               ui.layout(
                   breakpoint='xl',
@@ -41,18 +65,46 @@ layout1 = ui.meta_card(box='', layouts=[
               )
             ])
 
-layout2 = ui.meta_card(box='', layouts=[
+layout2 = ui.meta_card(box='', title='集成隐写/分析平台', layouts=[
                 ui.layout(
                     breakpoint='xs',
                     zones=[
-                        # Add zones here.
-                    ],
+                        ui.zone('header'),
+                        ui.zone('body', direction=ui.ZoneDirection.ROW, zones=[
+                            ui.zone('sidebar', size='25%'),
+                            ui.zone('body', size='75%', direction=ui.ZoneDirection.COLUMN, zones=[
+                                ui.zone('tab_bar', size='15%'),
+                                ui.zone('content', size='85%', direction=ui.ZoneDirection.ROW, zones=[
+                                    # ui.zone('content_upper', size="10%"),
+                                    # ui.zone('content_lower', size="90%", direction=ui.ZoneDirection.ROW, zones=[
+                                    ui.zone('content_left', size="50%"),
+                                    ui.zone('content_right', size="50%"),
+                                    # ]),
+                                ])
+                            ]),
+                        ]),
+                        ui.zone('footer'),
+                    ]
                 ),
                 ui.layout(
                     breakpoint='m',
                     zones=[
-                        # Add zones here.
-                    ],
+                        ui.zone('header'),
+                        ui.zone('body', direction=ui.ZoneDirection.ROW, zones=[
+                            ui.zone('sidebar', size='25%'),
+                            ui.zone('body', size='75%', direction=ui.ZoneDirection.COLUMN, zones=[
+                                ui.zone('tab_bar', size='15%'),
+                                ui.zone('content', size='85%', direction=ui.ZoneDirection.ROW, zones=[
+                                    # ui.zone('content_upper', size="10%"),
+                                    # ui.zone('content_lower', size="90%", direction=ui.ZoneDirection.ROW, zones=[
+                                    ui.zone('content_left', size="50%"),
+                                    ui.zone('content_right', size="50%"),
+                                    # ]),
+                                ])
+                            ]),
+                        ]),
+                        ui.zone('footer'),
+                    ]
                 ),
                 ui.layout(
                     breakpoint='xl',
@@ -64,8 +116,11 @@ layout2 = ui.meta_card(box='', layouts=[
                             ui.zone('body', size='75%', direction=ui.ZoneDirection.COLUMN, zones=[
                                 ui.zone('tab_bar', size='15%'),
                                 ui.zone('content', size='85%', direction=ui.ZoneDirection.ROW, zones=[
-                                    ui.zone('content_left', size='50%'),
-                                    ui.zone('content_right', size='50%'),
+                                    # ui.zone('content_upper', size="10%"),
+                                    # ui.zone('content_lower', size="90%", direction=ui.ZoneDirection.ROW, zones=[
+                                    ui.zone('content_left', size="50%"),
+                                    ui.zone('content_right', size="50%"),
+                                    # ]),
                                 ])
                             ]),
                         ]),
@@ -74,6 +129,11 @@ layout2 = ui.meta_card(box='', layouts=[
                 )
             ])
 
+eval_transforms = T.Compose([
+    T.ToTensor()
+])
+
+models = {'YedNet': YedNet, 'ZhuNet': ZhuNet}
 #================================================================
 # 菜单项
 #================================================================
@@ -83,9 +143,11 @@ async def serve(q:Q):
     q.page['meta'] = layout1
     q.page['v_nav'].value = '#menu/index'
     q.page['tab_bar'] = ui.tab_card(box='tab_bar', items=[
-        ui.tab('dataset_img', '图像隐写'),
-        ui.tab('dataset_text', '文本隐写'),
-        ui.tab('download', '下载专区'),
+        ui.tab('image_stega', '图像隐写'),
+        ui.tab('image_steganalysis', '图像隐写分析'),
+        ui.tab('text_stega', '文本隐写'),
+        ui.tab('text_steganalysis', '文本隐写分析'),
+        ui.tab('#menu/download_section', '下载专区'),
     ])
     q.page['content'] = ui.form_card(box='content', items=[
         ui.text('正在开发中...')
@@ -98,9 +160,12 @@ async def serve(q:Q):
     q.page['meta'] = layout1
     q.page['v_nav'].value = '#menu/steganography'
     q.page['tab_bar'] = ui.tab_card(box='tab_bar', items=[
-        ui.tab('#menu/steganography', '文本隐写'),
+        ui.tab('text_stega', '文本隐写'),
         ui.tab('image_stega', '图像隐写'),
         ui.tab('image_watermark', '数字水印'),
+    ])
+    q.page['content'] = ui.form_card(box='content', items=[
+        ui.text('正在开发中...')
     ])
     await q.page.save()
 
@@ -118,55 +183,17 @@ async def serve(q:Q):
     ])
     await q.page.save()
 
-
-
-@on(arg='#menu/dataset')
+@on(arg='#menu/download_section')
 async def serve(q:Q):
     empty(q)
     q.page['meta'] = layout1
-    q.page['v_nav'].value = '#menu/dataset'
+    q.page['v_nav'].value = '#menu/download_section'
     q.page['tab_bar'] = ui.tab_card(box='tab_bar', items=[
         ui.tab('dataset_img', '图像隐写'),
         ui.tab('dataset_text', '文本隐写'),
     ])
-    await q.page.save()
-
-
-@on(arg='dataset_text')
-async def serve(q:Q):
-    empty(q)
-    q.page['meta'] = layout1
     q.page['content'] = ui.form_card(box='content', items=[
         ui.text('正在开发中...')
-    ])
-    # q.page['chat'] = ui.chat_card(box='3 3 5 8', title='chat')
-    await q.page.save()
-
-@on(arg='dataset_img')
-async def serve(q:Q):
-    empty(q)
-    cover_md = '''
-    [BOSSBASE_v1.01](http://dde.binghamton.edu/download/ImageDB/BOSSbase_1.01.zip)'''
-    spatial_md = """
-    - WOW
-    - HUGO
-    - S-UNIWARD
-    - HILL
-    - MiPOD
-    """
-    freq_md = """
-    - J-UNIWARD
-    - UERD
-    - J-MiPOD
-    """
-    q.page['content'] = ui.form_card(box='content', items=[
-        ui.text('# 1. Cover'),
-        ui.link('BOSSbase_v1.01', 'http://dde.binghamton.edu/download/ImageDB/BOSSbase_1.01.zip'),
-        ui.text('# 2. 空域自适应隐写'),
-        ui.text(spatial_md, size='l'),
-        ui.text('# 3. 频域自适应隐写'),
-        ui.text(freq_md),
-        ui.text('# 4. 神经网络隐写')
     ])
     await q.page.save()
 
@@ -299,10 +326,10 @@ async def serve(q:Q):
 @on(arg='extract')
 async def serve(q:Q):
     q.page['meta'] = layout1
-    q.page['upload'] = ui.form_card(box=ui.box('content', order=2, height='450px'), title='', items=[
+    q.page['upload'] = ui.form_card(box=ui.box('content', order=2, height='500px'), title='', items=[
         ui.text('1.输入水印大小:'),
-        ui.textbox(name='width', label='宽', value='64'),
-        ui.textbox(name='height', label='高', value='64'),
+        ui.textbox(name='width', label='宽:', value='64'),
+        ui.textbox(name='height', label='高:', value='64'),
         ui.text('2.上传带水印图片:'),
         ui.file_upload(name='watermarked', label='上传', multiple=False,
                             file_extensions=['png', 'jpg'], max_file_size=10, max_size=15, height='2'),
@@ -346,11 +373,27 @@ async def serve(q:Q):
 
 @on(arg='text_stega')
 async def serve(q:Q):
+    del q.page['content_left1']
+    del q.page['content_left2']
     empty(q)
-    q.page['meta'] = layout1
+    q.page['meta'] = layout2
     q.page['v_nav'].value = '#menu/steganography'
-    q.page['content'] = ui.form_card(box='content', items=[
-        ui.text('正在开发中...')
+    # q.page['content'] = ui.form_card(box='content', items=[
+    #     ui.text('正在开发中...')
+    # ])
+    q.page['content_upper'] = ui.tab_card(box='content_upper', items=[])
+    q.page['content_left'] = ui.form_card(box='content_left', title='Inputs', items=[
+        ui.textbox(name='prefix_words', label='句子开头:', required=True, placeholder='e.g. I have a ...'),
+        ui.textbox(name='secret', label='秘密信息比特流:', required=True, placeholder='e.g. 0101011011'),
+        ui.dropdown('option', label='语言模型:', value='rnn', choices=[
+            ui.choice('rnn', 'RNN-Stega'),
+            ui.choice('vae', 'VAE-Stega'),
+            ui.choice('gpt', 'GPT-Stega'),
+        ]),
+        ui.button('start_gen', label='开始生成', primary=True)
+    ])
+    q.page['content_right'] = ui.form_card(box='content_right', title='Outputs', items=[
+        ui.text('blalala....'),
     ])
     await q.page.save()
 
@@ -359,18 +402,107 @@ async def serve(q:Q):
 #================================================================
 @on(arg='image_steganalysis')
 async def serve(q:Q):
+    del q.page['content_left']
     q.page['meta'] = layout2
     q.page['v_nav'].value = '#menu/steganalysis'
-    q.page['content_left'] = ui.form_card(box='content_left', items=[
-        ui.text('马上弄')
+    q.page['content_left1'] = ui.tab_card(box=ui.box('content_left', order=1, height='50px'), link=True, items=[
+        ui.tab('image_steganalysis', '单张图片检测'),
+        ui.tab('dataset_level', '数据集检测'),
     ])
-    q.page['content_right'] = ui.form_card(box='content_right', items=[
-        ui.text('马上弄2')
+    q.page['content_right1'] = ui.tab_card(box=ui.box('content_right', order=1, height='50px'), link=True, items=[
+
     ])
+    ic(q.client.instance_level)
+    if not q.client.instance_level:
+        q.page['content_left2'] = ui.form_card(box=ui.box('content_left', order=2, height='550px'), title='Inputs', items=[
+            ui.text('**上传可疑图片:**'),
+            ui.file_upload(name='suspect_img', label='上传', multiple=False, file_extensions=['png', 'jpg', 'jpeg'], max_file_size=10, max_size=15, height='3'),
+            # ui.dropdown('option', label='隐写分析模型:', value='SRNet', choices=[
+            #     ui.choice('SRNet', 'SRNet'),
+            #     ui.choice('ZhuNet', 'ZhuNet'),
+            #     ui.choice('YedNet', 'Yedroudj-Net'),
+            #     ui.choice('srm', 'SRM'),
+            # ]),
+            ui.checklist(name='checklist', label='隐写分析模型',
+                            choices=[ui.choice(name=x, label=x) for x in ['SRNet', 'ZhuNet', 'YedNet', 'SRM']]),
+
+            ui.button('start_analysis', label='开始检测', primary=True)
+        ])
+        q.page['content_right2'] = ui.form_card(box=ui.box('content_right', order=2), title='Outputs', items=[
+            ui.text('1111'),
+        ])
+        q.client.instance_level = True
+    await q.page.save()
+
+
+@on(arg='dataset_level')
+async def serve(q:Q):
+    q.client.instance_level = False
+    del q.page['content_left2']
+    q.page['content_left'] = ui.form_card(box=ui.box('content_left', order=2, height='550px'), title='Inputs', items=[
+        ui.checklist(name='checklist', label='数据集', choices=[ui.choice(name=x, label=x) for x in ['S-UNIWARD 0.4bpp', 'WOW 0.4bpp', 'HUGO 0.4bpp']]),
+        ui.checklist(name='checklist', label='隐写分析模型', choices=[ui.choice(name=x, label=x) for x in ['SRNet', 'ZhuNet', 'YedNet', 'SRM']]),
+        ui.button('start_dataset_analysis', label='开始检测', primary=True)
+    ])
+    await q.page.save()
+
+@on(arg='suspect_img')
+async def serve(q:Q):
+    path = q.args['suspect_img']
+    if path:
+        local_path = await q.site.download(path[0], './upload')
+        q.client.suspect_img_path = local_path
+        ic(local_path)
+        q.page['content_left'].items[1].file_upload.label = '已上传'
+        ic(vars(q.page))
+    await q.page.save()
+
+@on(arg='start_analysis')
+async def serve(q:Q):
+    suspect_img_path = q.client.suspect_img_path
+    checklist = q.args['checklist']
+    ic(suspect_img_path)
+    ic(checklist)
+    if suspect_img_path and checklist:
+        FLAG = False
+        for i in checklist:
+            if i not in ('ZhuNet', 'YedNet'):
+                FLAG = True
+        if FLAG:
+            q.page['meta'].dialog = ui.dialog(title='error', items=[
+                ui.text('对不起，暂不支持全部所选模型, 目前仅支持ZhuNet和YedNet!'),
+                ui.buttons([ui.button(name='sure', label='确定', primary=True)])
+            ])
+        else:
+            img = img_preprocess(suspect_img_path)
+            ic(img.shape)
+            result = {}
+            for i in checklist:
+                model = models[i]()
+
+                out = model(img)
+
+                out = F.softmax(out, dim=-1).squeeze()
+                result[i] = out.tolist()
+            ic(result)
+            
+            q.page['content_right2'] = ui.form_card(box=ui.box('content_right', order=2), title='Outputs', items=[
+                ui.text(f'检测模型:{checklist[0]}'),
+                ui.text(f"结果:{str(result)}"),
+            ])
+            q.page['content_left'].items[1].file_upload.label = '上传'
+            # del q.client.suspect_img_path
+    else:
+        q.page['meta'].dialog = ui.dialog(title='error', items=[
+            ui.text('对不起，请检查是否输入完整!'),
+            ui.buttons([ui.button(name='sure', label='确定', primary=True)])
+        ])
     await q.page.save()
 
 @on(arg='text_steganalysis')
 async def serve(q:Q):
+    del q.page['content_left1']
+    del q.page['content_left2']
     q.page['meta'] = layout2
     q.page['v_nav'].value = '#menu/steganalysis'
     q.page['content_left'] = ui.form_card(box='content_left', items=[
@@ -384,14 +516,42 @@ async def serve(q:Q):
 #================================================================
 # 下载专区
 #================================================================
-@on(arg='download_section')
+@on(arg='dataset_text')
 async def serve(q:Q):
     empty(q)
     q.page['meta'] = layout1
     q.page['content'] = ui.form_card(box='content', items=[
         ui.text('正在开发中...')
     ])
-    q.page['v_nav'].value = '#menu/download_section'
+    # q.page['chat'] = ui.chat_card(box='3 3 5 8', title='chat')
+    await q.page.save()
+
+@on(arg='dataset_img')
+async def serve(q:Q):
+    empty(q)
+    cover_md = '''
+    [BOSSBASE_v1.01](http://dde.binghamton.edu/download/ImageDB/BOSSbase_1.01.zip)'''
+    spatial_md = """
+    - WOW
+    - HUGO
+    - S-UNIWARD
+    - HILL
+    - MiPOD
+    """
+    freq_md = """
+    - J-UNIWARD
+    - UERD
+    - J-MiPOD
+    """
+    q.page['content'] = ui.form_card(box='content', items=[
+        ui.text('# 1. Cover'),
+        ui.link('BOSSbase_v1.01', 'http://dde.binghamton.edu/download/ImageDB/BOSSbase_1.01.zip'),
+        ui.text('# 2. 空域自适应隐写'),
+        ui.text(spatial_md, size='l'),
+        ui.text('# 3. 频域自适应隐写'),
+        ui.text(freq_md),
+        ui.text('# 4. 神经网络隐写')
+    ])
     await q.page.save()
 #================================================================
 # 首页
@@ -399,7 +559,7 @@ async def serve(q:Q):
 @app('/')
 async def serve(q:Q):
     ic(q.args)
-    ic(vars(q.page))
+    # ic(vars(q.page))
     if not q.client.initialized:
         q.page['meta'] = layout1
         q.page['header'] = ui.header_card(
@@ -413,7 +573,7 @@ async def serve(q:Q):
             ui.tab('image_steganalysis', '图像隐写分析'),
             ui.tab('text_stega', '文本隐写'),
             ui.tab('text_steganalysis', '文本隐写分析'),
-            ui.tab('download_section', '下载专区'),
+            ui.tab('#menu/download_section', '下载专区'),
         ])
         q.page['v_nav'] = ui.nav_card(
             box=ui.box('sidebar', height='500px'),
@@ -435,7 +595,7 @@ async def serve(q:Q):
             ui.text('正在开发中...')
         ])
         q.page['footer'] = ui.footer_card(box='footer', caption='江苏省南京市宁六路219号')
-
+        q.client.initialized = True
         await q.page.save()
     else:
         await handle_on(q)
@@ -473,3 +633,9 @@ def empty(q: Q):
 
 # ImageStega()
 
+
+def img_preprocess(img_path, eval_transforms=eval_transforms):
+    img = Image.open(img_path)
+    img = eval_transforms(img)
+    img = img.unsqueeze(0)
+    return img
