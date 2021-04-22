@@ -8,7 +8,7 @@ https://github.com/h2oai/wave/releases
 
 `tar -xzf wave-0.13.0-linux-amd64.tar.gz`
 
-` mv wave-0.13.0-linux-amd64 $HOME/wave`
+`mv wave-0.13.0-linux-amd64 $HOME/wave`
 
 3. 运行服务端进程
 
