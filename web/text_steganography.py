@@ -10,16 +10,8 @@ from web.utils import layout1, layout2, empty
 # 文本隐写
 #================================================================
 @on()
-async def text_stega(q:Q):
-    del q.page['content_left1']
-    del q.page['content_left2']
-    empty(q)
+async def text_embed(q:Q):
     q.page['meta'] = layout2
-    q.page['v_nav'].value = '#menu/steganography'
-    # q.page['content'] = ui.form_card(box='content', items=[
-    #     ui.text('正在开发中...')
-    # ])
-    q.page['content_upper'] = ui.tab_card(box='content_upper', items=[])
     q.page['content_left'] = ui.form_card(box='content_left', title='Inputs', items=[
         ui.textbox(name='prefix_words', label='句子开头:', required=True, placeholder='e.g. I have a ...'),
         ui.textbox(name='secret', label='秘密信息比特流:', required=True, placeholder='e.g. 0101011011'),
@@ -29,6 +21,27 @@ async def text_stega(q:Q):
             ui.choice('gpt', 'GPT-Stega'),
         ]),
         ui.button('start_gen', label='开始生成', primary=True)
+    ])
+    q.page['content_right'] = ui.form_card(box='content_right', title='Outputs', items=[
+        ui.text('blalala....'),
+    ])
+    await q.page.save()
+
+@on()
+async def text_extract(q:Q):
+    q.page['meta'] = layout2
+    q.page['v_nav'].value = '#menu/steganography'
+    # q.page['content'] = ui.form_card(box='content', items=[
+    #     ui.text('正在开发中...')
+    # ])
+    q.page['content_left'] = ui.form_card(box='content_left', title='Inputs', items=[
+        ui.textbox(name='secret_text', label='秘密文本:', required=True, placeholder='e.g. I have a ...'),
+        ui.dropdown('option', label='语言模型:', value='rnn', choices=[
+            ui.choice('rnn', 'RNN-Stega'),
+            ui.choice('vae', 'VAE-Stega'),
+            ui.choice('gpt', 'GPT-Stega'),
+        ]),
+        ui.button('text_start_extract', label='开始提取', primary=True)
     ])
     q.page['content_right'] = ui.form_card(box='content_right', title='Outputs', items=[
         ui.text('blalala....'),

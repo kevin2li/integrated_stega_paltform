@@ -23,6 +23,43 @@ async def image_stega(q:Q):
     ''')
     await q.page.save()
 
+@on()
+async def image_embed(q:Q):
+    q.page['meta'] = layout2
+    q.page['content_left'] = ui.form_card(box=ui.box('content_left'), title='Inputs', items=[
+        ui.text('**上传载体图片:**'),
+        ui.file_upload(name='cover', label='上传', multiple=False,
+                            file_extensions=['png', 'jpg'], max_file_size=10, max_size=15, height='2'),
+        ui.checklist(name='embed_checklist', label='嵌入方式', choices=[ui.choice(name=x, label=x) for x in ['A', 'B', 'C', 'D']]),
+        ui.button('image_extract_secret', '开始嵌入', primary=False, disabled=True)
+    ])
+    q.page['content_right'] = ui.form_card(box=ui.box('content_right'), title='Outputs', items=[
+        ui.text('blaaa...'),
+    ])
+    await q.page.save()
+
+@on()
+async def image_extract(q:Q):
+    q.page['meta'] = layout2
+    q.page['content_left'] = ui.form_card(box=ui.box('content_left'), title='Inputs', items=[
+        ui.text('**上传含密图片:**'),
+        ui.file_upload(name='watermarked', label='上传', multiple=False,
+                            file_extensions=['png', 'jpg'], max_file_size=10, max_size=15, height='2'),
+        ui.checklist(name='embed_checklist', label='嵌入方式', choices=[ui.choice(name=x, label=x) for x in ['A', 'B', 'C', 'D']]),
+        ui.button('image_extract_secret', '开始提取', primary=False, disabled=True)
+    ])
+    q.page['content_right'] = ui.form_card(box=ui.box('content_right'), title='Outputs', items=[
+        ui.text('blaaa...'),
+    ])    
+    await q.page.save()
+
+@on()
+async def image_extract_secret(q:Q):
+    #TODO
+    q.page['content_left'] = ui.form_card(box=ui.box('content_left'), items=[])
+    q.page['content_right'] = ui.form_card(box=ui.box('content_right'), items=[])
+    await q.page.save()
+
 #================================================================
 # 数字水印
 #================================================================
@@ -33,9 +70,9 @@ async def image_watermark(q:Q):
     ic(q.args)
     q.page['wm_option'] = ui.tab_card(box=ui.box('content', height='10%'), items=[
         ui.tab('image_watermark', '嵌入水印'),
-        ui.tab('extract', '提取水印')
+        ui.tab('extract_wm', '提取水印')
     ], link=True)
-    q.page['upload'] = ui.form_card(box=ui.box('content', order=2, height='400px'), title='', items=[
+    q.page['content'] = ui.form_card(box=ui.box('content', order=2, height='400px'), title='', items=[
         ui.stepper(name='stepper', items=[
             ui.step(label='Step 1', icon='上传原图'),
             ui.step(label='Step 2', icon='上传水印'),
@@ -130,9 +167,9 @@ async def start_embed(q:Q):
     await q.page.save()
 
 @on()
-async def extract(q:Q):
+async def extract_wm(q:Q):
     q.page['meta'] = layout1
-    q.page['upload'] = ui.form_card(box=ui.box('content', order=2, height='500px'), title='', items=[
+    q.page['content'] = ui.form_card(box=ui.box('content', order=2, height='500px'), title='', items=[
         ui.text('1.输入水印大小:'),
         ui.textbox(name='width', label='宽:', value='64'),
         ui.textbox(name='height', label='高:', value='64'),

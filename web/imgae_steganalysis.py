@@ -5,7 +5,6 @@ sys.path.append(os.path.abspath('..'))
 from h2o_wave import Q, app, handle_on, main, on, ui
 from icecream import ic
 from web.utils import *
-from web.index import reset
 import torch.nn.functional as F
 from src.models import YedNet, ZhuNet
 models = {'YedNet': YedNet, 'ZhuNet': ZhuNet}
@@ -27,9 +26,9 @@ async def image_instance_level(q:Q):
         ui.checklist(name='checklist', label='隐写分析模型',
                         choices=[ui.choice(name=x, label=x) for x in ['SRNet', 'ZhuNet', 'YedNet', 'SRM']]),
 
-        ui.button('start_analysis', label='开始检测', primary=True)
+        ui.button('image_start_analysis', label='开始检测', primary=True)
     ])
-    q.page['content_right2'] = ui.form_card(box=ui.box('content_right', order=2), title='Outputs', items=[
+    q.page['content_right'] = ui.form_card(box=ui.box('content_right', order=2), title='Outputs', items=[
         ui.text('1111'),
     ])
     await q.page.save()
@@ -56,7 +55,7 @@ async def suspect_img(q:Q):
     await q.page.save()
 
 @on()
-async def start_analysis(q:Q):
+async def image_start_analysis(q:Q):
     suspect_img_path = q.client.suspect_img_path
     checklist = q.args['checklist']
     ic(suspect_img_path)

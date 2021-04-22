@@ -18,7 +18,7 @@ first_level_menu = {
     'menu/image_steganalysis': '图像隐写分析',
     'menu/text_stega': '文本隐写',
     'menu/text_steganalysis': '文本隐写分析',
-    'menu/download_section': '文本隐写分析',
+    'menu/download_section': '下载专区',
 }
 first_level_help = {
     'help/about': '关于',
@@ -28,15 +28,13 @@ first_level_help = {
 #================================================================
 # 首页
 #================================================================
-async def reset(q:Q):
-    if not q.client.initialized:
-        await menu_index(q)
-
 @app('/')
 async def serve(q:Q):
     ic(q.args)
     # ic(vars(q.page['tab_bar'].tab_bar))
     ic(q.client.initialized)
+    if not q.client.initialized:
+        await menu_index(q)
     location = q.args['#']
     ic(location)
     if location:
@@ -100,7 +98,6 @@ async def menu_index(q:Q):
 
 @on(arg='#menu/image_stega')
 async def menu_image_stega(q:Q):
-    await reset(q)
     q.page['meta'] = layout1
     q.page['v_nav'].value = '#menu/image_stega'
     q.page['tab_bar'] = ui.tab_card(box='tab_bar', items=[
@@ -108,56 +105,40 @@ async def menu_image_stega(q:Q):
         ui.tab('image_extract', '提取'),
         ui.tab('image_watermark', '数字水印'),
     ])
-    q.page['content'] = ui.form_card(box='content', items=[
-        ui.text('正在开发中...')
-    ])
-    await q.page.save()
+    await image_embed(q)
 
 @on(arg='#menu/image_steganalysis')
 async def menu_image_steganalysis(q:Q):
-    await reset(q)
-    empty(q)
     q.page['meta'] = layout1
     q.page['v_nav'].value = '#menu/image_steganalysis'
     q.page['tab_bar'] = ui.tab_card(box='tab_bar', items=[
         ui.tab('image_instance_level', '单样本分析'),
         ui.tab('image_dataset_level', '数据集分析'),
     ])
-    q.args['image_instance_level'] = True
     await image_instance_level(q)
 
 @on(arg='#menu/text_stega')
 async def menu_text_stega(q:Q):
-    await reset(q)
     q.page['meta'] = layout1
     q.page['v_nav'].value = '#menu/text_stega'
     q.page['tab_bar'] = ui.tab_card(box='tab_bar', items=[
         ui.tab('text_embed', '嵌入'),
         ui.tab('text_extract', '提取'),
     ])
-    q.page['content'] = ui.form_card(box='content', items=[
-        ui.text('正在开发中...')
-    ])
-    await q.page.save()
+    await text_embed(q)
 
 @on(arg='#menu/text_steganalysis')
 async def menu_text_steganalysis(q:Q):
-    await reset(q)
-    empty(q)
     q.page['meta'] = layout1
     q.page['v_nav'].value = '#menu/text_steganalysis'
     q.page['tab_bar'] = ui.tab_card(box='tab_bar', items=[
         ui.tab('text_instance_level', '单样本分析'),
         ui.tab('text_dataset_level', '数据集分析'),
     ])
-    q.page['content'] = ui.form_card(box='content', items=[
-        ui.text('正在开发中...')
-    ])
-    await q.page.save()
+    await text_instance_level(q)
 
 @on(arg='#menu/download_section')
 async def menu_download_section(q:Q):
-    await reset(q)
     q.page['meta'] = layout1
     q.page['v_nav'].value = '#menu/download_section'
     q.page['tab_bar'] = ui.tab_card(box='tab_bar', items=[
@@ -171,7 +152,6 @@ async def menu_download_section(q:Q):
 
 @on(arg='#help/about')
 async def help_about(q:Q):
-    await reset(q)
     q.page['meta'] = layout1
     q.page['v_nav'].value = '#help/about'
     q.page['tab_bar'] = ui.tab_card(box='tab_bar', items=[
@@ -184,7 +164,6 @@ async def help_about(q:Q):
 
 @on(arg='#help/support')
 async def help_support(q:Q):
-    await reset(q)
     q.page['meta'] = layout1
     q.page['v_nav'].value = '#help/support'
     q.page['tab_bar'] = ui.tab_card(box='tab_bar', items=[
