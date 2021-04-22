@@ -6,9 +6,9 @@ https://github.com/h2oai/wave/releases
 
 2. 解压并移动到home目录
 
-`tar -xzf wave-x.y.z-linux-amd64.tar.gz`
+`tar -xzf wave-0.13.0-linux-amd64.tar.gz`
 
-` mv wave-x.y.z-linux-amd64 $HOME/wave`
+`mv wave-0.13.0-linux-amd64 $HOME/wave`
 
 3. 运行服务端进程
 
