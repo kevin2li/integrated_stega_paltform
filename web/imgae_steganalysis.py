@@ -1,12 +1,20 @@
+'''
+Author: your name
+Date: 2021-04-22 11:08:05
+LastEditTime: 2021-04-23 18:43:15
+LastEditors: Please set LastEditors
+Description: In User Settings Edit
+FilePath: /myapps/web/imgae_steganalysis.py
+'''
 import os
 import sys
 sys.path.append(os.path.abspath('..'))
-
+import torch
 from h2o_wave import Q, app, handle_on, main, on, ui
 from icecream import ic
 from web.utils import *
 import torch.nn.functional as F
-from src.models import YedNet, ZhuNet
+from project.sa import YedNet, ZhuNet
 models = {'YedNet': YedNet, 'ZhuNet': ZhuNet}
 #================================================================
 # 图像隐写分析
@@ -77,12 +85,15 @@ async def image_start_analysis(q:Q):
             result = {}
             for i in checklist:
                 model = models[i]()
+                if i == 'ZhuNet':
+                    params = torch.load('/home/kevin2li/wave/myapps/project/sa/zhunet/zhunet_wow.ptparams', map_location='cpu')
+                    model.load_state_dict(params)
                 out = model(img)
                 out = F.softmax(out, dim=-1).squeeze()
                 result[i] = out.tolist()
             ic(result)
             
-            q.page['content_right2'] = ui.form_card(box=ui.box('content_right', order=2), title='Outputs', items=[
+            q.page['content_right'] = ui.form_card(box=ui.box('content_right'), title='Outputs', items=[
                 ui.text(f'检测模型:{checklist[0]}'),
                 ui.text(f"结果:{str(result)}"),
             ])

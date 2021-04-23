@@ -5,7 +5,6 @@ from pathlib import Path
 from h2o_wave import Q, app, handle_on, main, on, ui
 from icecream import ic
 from web.utils import layout1, layout2, empty
-import src.bwm as bwm
 
 #================================================================
 # 图像隐写

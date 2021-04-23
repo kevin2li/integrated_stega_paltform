@@ -103,7 +103,7 @@ async def menu_image_stega(q:Q):
     q.page['tab_bar'] = ui.tab_card(box='tab_bar', items=[
         ui.tab('image_embed', '嵌入'),
         ui.tab('image_extract', '提取'),
-        ui.tab('image_watermark', '数字水印'),
+        # ui.tab('image_watermark', '数字水印'),
     ])
     await image_embed(q)
 
