@@ -28,7 +28,7 @@ async def image_embed(q:Q):
     q.page['content_left'] = ui.form_card(box=ui.box('content_left'), title='Inputs', items=[
         ui.text('**上传载体图片:**'),
         ui.file_upload(name='cover', label='上传', multiple=False,
-                            file_extensions=['png', 'jpg'], max_file_size=10, max_size=15, height='2'),
+                            file_extensions=['png', 'jpg'], max_file_size=10, max_size=15, height='200px'),
         ui.checklist(name='embed_checklist', label='嵌入方式', choices=[ui.choice(name=x, label=x) for x in ['A', 'B', 'C', 'D']]),
         ui.button('image_extract_secret', '开始嵌入', primary=False, disabled=True)
     ])
@@ -43,7 +43,7 @@ async def image_extract(q:Q):
     q.page['content_left'] = ui.form_card(box=ui.box('content_left'), title='Inputs', items=[
         ui.text('**上传含密图片:**'),
         ui.file_upload(name='watermarked', label='上传', multiple=False,
-                            file_extensions=['png', 'jpg'], max_file_size=10, max_size=15, height='2'),
+                            file_extensions=['png', 'jpg'], max_file_size=10, max_size=15, height='200px'),
         ui.checklist(name='embed_checklist', label='嵌入方式', choices=[ui.choice(name=x, label=x) for x in ['A', 'B', 'C', 'D']]),
         ui.button('image_extract_secret', '开始提取', primary=False, disabled=True)
     ])
@@ -79,7 +79,7 @@ async def image_watermark(q:Q):
             ui.step(label='Step 4', icon='下载图片'),
         ]),
         ui.text_m('步骤一: 上传原图'),
-        ui.file_upload(name='origin', label='上传原图', multiple=False, file_extensions=['png', 'jpg', 'jpeg'], max_file_size=10, max_size=15, height='3'),
+        ui.file_upload(name='origin', label='上传原图', multiple=False, file_extensions=['png', 'jpg', 'jpeg'], max_file_size=10, max_size=15, height='200px'),
         ui.button('start_embed', '开始嵌入', primary=False, disabled=True)
     ])
     await q.page.save()
@@ -102,7 +102,7 @@ async def origin(q:Q):
                 ui.step(label='Step 4', icon='', done=False),
             ]),
             ui.text_m('步骤二: 上传水印'),
-            ui.file_upload(name='watermark', label='上传水印', multiple=False, file_extensions=['png', 'jpg', 'jpeg'], max_file_size=10, max_size=15, height='3'),
+            ui.file_upload(name='watermark', label='上传水印', multiple=False, file_extensions=['png', 'jpg', 'jpeg'], max_file_size=10, max_size=15, height='200px'),
             ui.button('start_embed', '开始嵌入', primary=False, disabled=True)
         ])
 
@@ -125,7 +125,7 @@ async def watermark(q:Q):
                 ui.step(label='Step 4', icon=''),
             ]),
             ui.text_m('步骤三: 开始嵌入'),
-            ui.file_upload(name='watermark', label='上传水印', multiple=False, file_extensions=['png', 'jpg', 'jpeg'], max_file_size=10, max_size=15, height='3'),
+            ui.file_upload(name='watermark', label='上传水印', multiple=False, file_extensions=['png', 'jpg', 'jpeg'], max_file_size=10, max_size=15, height='200px'),
             ui.button('start_embed', '开始嵌入', primary=True)
         ])
     await q.page.save()
@@ -155,7 +155,7 @@ async def start_embed(q:Q):
                 ui.step(label='Step 4', icon='', done=False),
             ]),
             ui.text_m('步骤四: 完成，点击下载'),
-            ui.file_upload(name='none', label='上传水印', multiple=False, file_extensions=['png', 'jpg', 'jpeg'], max_file_size=10, max_size=15, height='3'),
+            ui.file_upload(name='none', label='上传水印', multiple=False, file_extensions=['png', 'jpg', 'jpeg'], max_file_size=10, max_size=15, height='200px'),
             ui.link('下载', path=download_path, button=True)
         ])
     else:
@@ -174,7 +174,7 @@ async def extract_wm(q:Q):
         ui.textbox(name='height', label='高:', value='64'),
         ui.text('2.上传带水印图片:'),
         ui.file_upload(name='watermarked', label='上传', multiple=False,
-                            file_extensions=['png', 'jpg'], max_file_size=10, max_size=15, height='2'),
+                            file_extensions=['png', 'jpg'], max_file_size=10, max_size=15, height='200px'),
         ui.button('ex_wm', '下载', primary=False, disabled=True)
     ])
     await q.page.save()
@@ -192,7 +192,7 @@ async def watermarked(q:Q):
             ui.textbox(name='width', label='宽', value='64'),
             ui.textbox(name='height', label='高', value='64'),
             ui.file_upload(name='watermarked', label='上传', multiple=False,
-                                file_extensions=['png', 'jpg'], max_file_size=10, max_size=15, height='2'),
+                                file_extensions=['png', 'jpg'], max_file_size=10, max_size=15, height='200px'),
             ui.link('下载', path=out_path, button=True)
         ])
     await q.page.save()
