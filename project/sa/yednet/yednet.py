@@ -1,7 +1,7 @@
 '''
 Author: your name
 Date: 2021-04-23 18:22:54
-LastEditTime: 2021-04-23 18:24:45
+LastEditTime: 2021-04-23 19:49:07
 LastEditors: Please set LastEditors
 Description: In User Settings Edit
 FilePath: /myapps/project/sa/yednet/__init__.py
@@ -84,51 +84,49 @@ class SPPLayer(nn.Module):
 class YedNet(nn.Module):
     def __init__(self):
         super(YedNet, self).__init__()
-        self.hpf = HPF()
-        self.group1 = nn.Sequential(
-            nn.Conv2d(30, 30, 5, 1, 2),
+        self.feature_extractor = nn.Sequential()
+        self.feature_extractor.add_module("layer1", HPF())
+        self.feature_extractor.add_module("layer2",nn.Sequential(
+            nn.Conv2d(in_channels=30, out_channels=30, kernel_size=5, stride=1, padding=2),
             ABS(),
             nn.BatchNorm2d(30),
             TLU(3.0)
-        )
-        self.group2 = nn.Sequential(
-            nn.Conv2d(30, 30, 5, 1, 2),
+        ))
+        self.feature_extractor.add_module("layer3", nn.Sequential(
+            nn.Conv2d(in_channels=30, out_channels=30, kernel_size=5, stride=1, padding=2),
             nn.BatchNorm2d(30),
-            TLU(3.0),
-            nn.AdaptiveAvgPool2d((128, 128))
-        )
-        self.group3 = nn.Sequential(
-            nn.Conv2d(30, 32, 5, 1, 2),
+            TLU(1.0),
+            nn.AvgPool2d(kernel_size=5, stride=2, padding=2)
+        ))
+        self.feature_extractor.add_module("layer4", nn.Sequential(
+            nn.Conv2d(in_channels=30, out_channels=32, kernel_size=3, stride=1, padding=1),
             nn.BatchNorm2d(32),
             nn.ReLU(),
-            nn.AdaptiveAvgPool2d((64, 64))
-        )
-        self.group4 = nn.Sequential(
-            nn.Conv2d(32, 64, 5, 1, 2),
+            nn.AvgPool2d(kernel_size=5, stride=2, padding=2)
+        ))
+        self.feature_extractor.add_module("layer5", nn.Sequential(
+            nn.Conv2d(in_channels=32, out_channels=64, kernel_size=3, stride=1, padding=1),
             nn.BatchNorm2d(64),
             nn.ReLU(),
-            nn.AdaptiveAvgPool2d((32, 32))
-        )
-        self.group5 = nn.Sequential(
-            nn.Conv2d(64, 128, 5, 1, 2),
+            nn.AvgPool2d(kernel_size=5, stride=2, padding=2)
+        ))
+        self.feature_extractor.add_module("layer6", nn.Sequential(
+            nn.Conv2d(in_channels=64, out_channels=128, kernel_size=3, stride=1, padding=1),
             nn.BatchNorm2d(128),
             nn.ReLU(),
-            nn.AdaptiveAvgPool2d((1, 1))
-        )
-        self.classfier = nn.Sequential(
+            nn.AdaptiveAvgPool2d((1, 1))    # global avg pooling
+        ))
+        self.fc = nn.Sequential(
             nn.Linear(128, 256),
             nn.ReLU(),
             nn.Linear(256, 1024),
             nn.ReLU(),
-            nn.Linear(1024, 2)
+            nn.Linear(1024, 2),
+            nn.Softmax(dim=1)
         )
-
-    def forward(self, x):
-        x = self.hpf(x)
-        x = self.group1(x)
-        x = self.group2(x)
-        x = self.group3(x)
-        x = self.group4(x)
-        x = self.group5(x)
-        out = self.classfier(x)
+        
+    def forward(self, input):
+        out = self.feature_extractor(input)
+        out = out.view(-1, 128)
+        out = self.fc(out)
         return out
