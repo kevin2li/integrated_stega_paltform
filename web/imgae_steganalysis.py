@@ -30,8 +30,9 @@ async def image_instance_level(q:Q):
     q.page['meta'] = layout2
     q.page['content_left'] = ui.form_card(box=ui.box('content_left', order=2, height='550px'), title='Inputs', items=[
         ui.text('**上传可疑图片:**'),
-        ui.file_upload(name='suspect_img', label='上传', multiple=False, file_extensions=['png', 'jpg', 'jpeg'], max_file_size=10, max_size=15, height='3'),
-        ui.dropdown('options', label='隐写分析模型:', values=['SRNet'], required=True, choices=[
+        ui.file_upload(name='suspect_img', label='上传', multiple=False, file_extensions=['png', 'jpg', 'jpeg'], max_file_size=10, max_size=15, height='200px'),
+        ui.text('只有ZhuNet能用'),
+        ui.dropdown('options', label='隐写分析模型:', values=['ZhuNet'], required=True, choices=[
             ui.choice(name=x, label=x) for x in ['SRNet', 'ZhuNet', 'YedNet', 'XuNet', 'SRM', 'A', 'B', 'C', 'D', 'E', 'F']
         ]),
         # ui.checklist(name='checklist', label='隐写分析模型',
@@ -91,7 +92,7 @@ async def image_start_analysis(q:Q):
             for i in options:
                 model = models[i]()
                 if i == 'ZhuNet':
-                    params = torch.load('/home/wave/myapp/project/sa/zhunet/zhunet_wow.ptparams', map_location='cpu')
+                    params = torch.load('/root/wave/myapp/project/sa/zhunet/zhunet_wow.ptparams', map_location='cpu')
                     model.load_state_dict(params)
                 out = model(img)
                 out = F.softmax(out, dim=-1).squeeze()
@@ -100,6 +101,7 @@ async def image_start_analysis(q:Q):
             df = pd.DataFrame()
             df['type'] = ['cover', 'stego']
             df['prob'] = result['ZhuNet']
+
             q.page['content_right'] = ui.form_card(box=ui.box('content_right'), title='Outputs', items=[
                 ui.text(f"结果:{str(result)}"),
                 ui.visualization(ui.plot([ui.mark(type='interval', x='=type', y='=prob', x_title='类型', y_title='概率')]), data=data(fields=df.columns.tolist(), rows=df.values.tolist(), pack=True))
