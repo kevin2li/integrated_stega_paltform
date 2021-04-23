@@ -9,6 +9,7 @@ FilePath: /myapps/web/imgae_steganalysis.py
 import os
 import sys
 sys.path.append(os.path.abspath('..'))
+from pathlib import Path
 import torch
 from h2o_wave import Q, app, handle_on, main, on, ui
 from icecream import ic
@@ -55,7 +56,9 @@ async def image_dataset_level(q:Q):
 async def suspect_img(q:Q):
     path = q.args['suspect_img']
     if path:
-        local_path = await q.site.download(path[0], './upload')
+        save_dir = Path('./upload')
+        save_dir.mkdir(parents=True, exist_ok=True)
+        local_path = await q.site.download(path[0], save_dir)
         q.client.suspect_img_path = local_path
         ic(local_path)
         q.page['content_left'].items[1].file_upload.label = '已上传'
@@ -86,7 +89,7 @@ async def image_start_analysis(q:Q):
             for i in checklist:
                 model = models[i]()
                 if i == 'ZhuNet':
-                    params = torch.load('/home/kevin2li/wave/myapps/project/sa/zhunet/zhunet_wow.ptparams', map_location='cpu')
+                    params = torch.load('/home/wave/myapp/project/sa/zhunet/zhunet_wow.ptparams', map_location='cpu')
                     model.load_state_dict(params)
                 out = model(img)
                 out = F.softmax(out, dim=-1).squeeze()
