@@ -19,11 +19,9 @@ from icecream import ic
 from project.sa import YedNet, ZhuNet, XuNet
 from pathlib import Path
 from web.utils import *
-
-root_dir = Path('/home/kevin2li/wave/myapps/')  # wsl
+# root_dir = Path('/home/kevin2li/wave/myapps/')  # wsl
 # root_dir = Path('/root/wave/myapp')  # aliyun
-# root_dir = Path('/home/likai/integrated_stega_paltform/') # lab
-
+root_dir = Path('/home/likai/integrated_stega_paltform/') # lab
 #================================================================
 # 图像隐写分析
 #================================================================

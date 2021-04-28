@@ -12,7 +12,7 @@ import os
 import random
 import time as tm
 from time import time
-from tqdm import tqdm
+
 import cv2
 import matplotlib as mpl
 import matplotlib.colors as colors
@@ -40,6 +40,7 @@ from tensorflow.keras.layers import (LSTM, Activation, AveragePooling2D,
 from tensorflow.keras.models import Sequential, load_model
 from tensorflow.keras.regularizers import l2
 from tensorflow.keras.utils import plot_model
+from tqdm import tqdm
 
 ################################################## 30 SRM FILTERS
 srm_weights = np.load('SRM_Kernels.npy')

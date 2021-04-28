@@ -1,21 +1,24 @@
 '''
 Author: 李大秋
 Date: 2021-04-21 21:10:07
-LastEditTime: 2021-04-28 18:58:56
+LastEditTime: 2021-04-28 19:07:09
 LastEditors: Please set LastEditors
 Description: In User Settings Edit
 FilePath: /myapps/src/xunet/XuNet_Test.py
 '''
 # %%
+from pathlib import Path
 import numpy
 import numpy as np
 import tensorflow as tf
 from keras import backend as K
-from PIL import Image
 from tensorflow.keras.layers import (AveragePooling2D, BatchNormalization, Concatenate, Conv2D, Dense, GlobalAveragePooling2D, Lambda, ReLU)
-from tqdm import tqdm
 
-srm_weights = np.load('/home/kevin2li/wave/myapps/project/sa/xunet/SRM_Kernels.npy')
+root_dir = Path('/home/kevin2li/wave/myapps/')  # wsl
+# root_dir = Path('/root/wave/myapp')  # aliyun
+# root_dir = Path('/home/likai/integrated_stega_paltform/') # lab
+
+srm_weights = np.load(str(root_dir / 'project/sa/xunet/SRM_Kernels.npy'))
 biasSRM = numpy.ones(30)
 
 T3 = 3
