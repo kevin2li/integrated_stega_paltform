@@ -144,11 +144,9 @@ async def menu_download_section(q:Q):
     q.page['tab_bar'] = ui.tab_card(box='tab_bar', items=[
         ui.tab('dataset', '数据集'),
         ui.tab('code', '代码'),
+        ui.tab('paper', '论文'),
     ])
-    q.page['content'] = ui.form_card(box='content', items=[
-        ui.text('正在开发中...')
-    ])
-    await q.page.save()
+    await dataset(q)
 
 @on(arg='#help/about')
 async def help_about(q:Q):

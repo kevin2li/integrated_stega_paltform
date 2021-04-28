@@ -1,7 +1,7 @@
 '''
 Author: your name
 Date: 2021-04-22 11:08:05
-LastEditTime: 2021-04-23 20:25:46
+LastEditTime: 2021-04-28 10:30:01
 LastEditors: Please set LastEditors
 Description: In User Settings Edit
 FilePath: /myapps/web/imgae_steganalysis.py
@@ -18,10 +18,13 @@ import torch.nn.functional as F
 from h2o_wave import Q, app, handle_on, main, on, ui, data
 from icecream import ic
 from project.sa import YedNet, ZhuNet
-
+from pathlib import Path
 from web.utils import *
 
-models = {'YedNet': YedNet, 'ZhuNet': ZhuNet}
+# root_dir = Path('/home/kevin2li/wave/myapps/')  # wsl
+root_dir = Path('/root/wave/myapp')  # aliyun
+# root_dir = Path('/home/likai/integrated_stega_paltform/') # lab
+
 #================================================================
 # 图像隐写分析
 #================================================================
@@ -31,9 +34,16 @@ async def image_instance_level(q:Q):
     q.page['content_left'] = ui.form_card(box=ui.box('content_left', order=2, height='550px'), title='Inputs', items=[
         ui.text('**上传可疑图片:**'),
         ui.file_upload(name='suspect_img', label='上传', multiple=False, file_extensions=['png', 'jpg', 'jpeg'], max_file_size=10, max_size=15, height='200px'),
-        ui.text('只有ZhuNet能用'),
-        ui.dropdown('options', label='隐写分析模型:', values=['ZhuNet'], required=True, choices=[
-            ui.choice(name=x, label=x) for x in ['SRNet', 'ZhuNet', 'YedNet', 'XuNet', 'SRM', 'A', 'B', 'C', 'D', 'E', 'F']
+        ui.expander(name='expander', label='高级选项', items=[
+            ui.dropdown('source', label='数据集:', value='cover', required=True, choices=[
+                ui.choice(name=x, label=x) for x in ['cover', 'wow', 'suniward', 'hill', 'hugo', 'juniward', 'uerd', 'ut-gan', 'jmipod']
+            ]),
+            ui.dropdown('embedding_rate', label='嵌入率:', value='0.4 bpp', required=True, choices=[
+                ui.choice(name=x, label=x) for x in ['0', '0.2 bpp', '0.4 bpp', '0.6 bpp', '0.8 bpp']
+            ]),
+        ]),
+        ui.dropdown('options', label='隐写分析模型:', values=['SRNet'], required=True, choices=[
+            ui.choice(name=x, label=x) for x in ['SRNet', 'ZhuNet', 'YedNet', 'XuNet', 'YeNet']
         ]),
         # ui.checklist(name='checklist', label='隐写分析模型',
         #                 choices=[ui.choice(name=x, label=x) for x in ['SRNet', 'ZhuNet', 'YedNet', 'XuNet', 'SRM', 'A', 'B', 'C', 'D', 'E', 'F']]),
@@ -41,7 +51,7 @@ async def image_instance_level(q:Q):
         ui.button('image_start_analysis', label='开始检测', primary=True)
     ])
     q.page['content_right'] = ui.form_card(box=ui.box('content_right', order=2), title='Outputs', items=[
-        ui.text('1111'),
+        # ui.text('1111'),
     ])
     await q.page.save()
 
@@ -59,9 +69,9 @@ async def image_dataset_level(q:Q):
 async def suspect_img(q:Q):
     path = q.args['suspect_img']
     if path:
-        save_dir = Path('./upload')
+        save_dir = Path('upload')
         save_dir.mkdir(parents=True, exist_ok=True)
-        local_path = await q.site.download(path[0], save_dir)
+        local_path = await q.site.download(path[0], str(save_dir))
         q.client.suspect_img_path = local_path
         ic(local_path)
         q.page['content_left'].items[1].file_upload.label = '已上传'
@@ -89,19 +99,22 @@ async def image_start_analysis(q:Q):
             img = img_preprocess(suspect_img_path)
             ic(img.shape)
             result = {}
-            for i in options:
-                model = models[i]()
-                if i == 'ZhuNet':
-                    params = torch.load('/root/wave/myapp/project/sa/zhunet/zhunet_wow.ptparams', map_location='cpu')
-                    model.load_state_dict(params)
+            for model_name in options:
+                model = eval(model_name)()
+                if model_name == 'ZhuNet':
+                    model = model.load_from_checkpoint(str(root_dir / 'project/sa/zhunet/zhunet-epoch=210-val_loss=0.44-val_acc=0.85.ckpt'))
+                elif model_name == 'YedNet':
+                    model = model.load_from_checkpoint(str(root_dir / 'project/sa/yednet/epoch=247-val_loss=0.48-val_acc=0.81.ckpt'))
+                    
+                model.eval()
                 out = model(img)
                 out = F.softmax(out, dim=-1).squeeze()
                 result[i] = out.tolist()
+                
             ic(result)
             df = pd.DataFrame()
             df['type'] = ['cover', 'stego']
-            df['prob'] = result['ZhuNet']
-
+            df['prob'] = result[model_name]
             q.page['content_right'] = ui.form_card(box=ui.box('content_right'), title='Outputs', items=[
                 ui.text(f"结果:{str(result)}"),
                 ui.visualization(ui.plot([ui.mark(type='interval', x='=type', y='=prob', x_title='类型', y_title='概率')]), data=data(fields=df.columns.tolist(), rows=df.values.tolist(), pack=True))
