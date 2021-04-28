@@ -17,9 +17,9 @@ import torch.nn.functional as F
 from h2o_wave import Q, app, handle_on, main, on, ui, data
 from icecream import ic
 from project.sa import YedNet, ZhuNet
-
+from pathlib import Path
 from web.utils import *
-
+root_dir = Path('/home/likai/integrated_stega_paltform/')
 #================================================================
 # 图像隐写分析
 #================================================================
@@ -64,7 +64,9 @@ async def image_dataset_level(q:Q):
 async def suspect_img(q:Q):
     path = q.args['suspect_img']
     if path:
-        local_path = await q.site.download(path[0], './upload')
+        save_dir = Path('upload')
+        save_dir.mkdir(parents=True, exist_ok=True)
+        local_path = await q.site.download(path[0], str(save_dir))
         q.client.suspect_img_path = local_path
         ic(local_path)
         q.page['content_left'].items[1].file_upload.label = '已上传'
@@ -95,11 +97,9 @@ async def image_start_analysis(q:Q):
             for model_name in options:
                 model = eval(model_name)()
                 if model_name == 'ZhuNet':
-                    model = model.load_from_checkpoint('/home/kevin2li/wave/myapps/project/sa/zhunet/zhunet-epoch=210-val_loss=0.44-val_acc=0.85.ckpt')
-                    # params = torch.load('/home/kevin2li/wave/myapps/project/sa/zhunet/zhunet-epoch=210-val_loss=0.44-val_acc=0.85.ckpt', map_location='cpu')
-                    # model.load_state_dict(params)
+                    model = model.load_from_checkpoint(str(root_dir / 'project/sa/zhunet/zhunet-epoch=210-val_loss=0.44-val_acc=0.85.ckpt'))
                 elif model_name == 'YedNet':
-                    model = model.load_from_checkpoint('/home/kevin2li/wave/myapps/project/sa/yednet/epoch=247-val_loss=0.48-val_acc=0.81.ckpt')
+                    model = model.load_from_checkpoint(str(root_dir / 'project/sa/yednet/epoch=247-val_loss=0.48-val_acc=0.81.ckpt'))
                     
                 model.eval()
                 out = model(img)
