@@ -1,7 +1,7 @@
 '''
 Author: your name
 Date: 2021-04-22 11:08:05
-LastEditTime: 2021-04-28 12:43:15
+LastEditTime: 2021-04-28 13:15:57
 LastEditors: Please set LastEditors
 Description: In User Settings Edit
 FilePath: /myapps/web/imgae_steganalysis.py
@@ -19,7 +19,11 @@ from icecream import ic
 from project.sa import YedNet, ZhuNet
 from pathlib import Path
 from web.utils import *
-root_dir = Path('/home/likai/integrated_stega_paltform/')
+
+root_dir = Path('/home/kevin2li/wave/myapps/')  # wsl
+# root_dir = Path('/root/wave/myapp')  # aliyun
+# root_dir = Path('/home/likai/integrated_stega_paltform/') # lab
+
 #================================================================
 # 图像隐写分析
 #================================================================
