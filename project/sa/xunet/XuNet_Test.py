@@ -1,7 +1,7 @@
 '''
 Author: 李大秋
 Date: 2021-04-21 21:10:07
-LastEditTime: 2021-04-28 10:37:00
+LastEditTime: 2021-04-28 16:02:13
 LastEditors: Please set LastEditors
 Description: In User Settings Edit
 FilePath: /myapps/src/xunet/XuNet_Test.py
@@ -48,7 +48,7 @@ print(srm_weights.shape)
 # srm_weights=np.resize(srm_weights,(5,5,3,30))
 print(srm_weights.shape)
 ################################################## TLU ACTIVATION FUNCTION
-T3 = 3;
+T3 = 3
 
 
 def Tanh3(x):
