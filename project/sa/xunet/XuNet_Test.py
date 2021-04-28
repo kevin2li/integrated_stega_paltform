@@ -12,7 +12,7 @@ import os
 import random
 import time as tm
 from time import time
-from tqdm import tqdm
+
 import cv2
 import matplotlib as mpl
 import matplotlib.colors as colors
@@ -40,6 +40,7 @@ from tensorflow.keras.layers import (LSTM, Activation, AveragePooling2D,
 from tensorflow.keras.models import Sequential, load_model
 from tensorflow.keras.regularizers import l2
 from tensorflow.keras.utils import plot_model
+from tqdm import tqdm
 
 ################################################## 30 SRM FILTERS
 srm_weights = np.load('SRM_Kernels.npy')
@@ -48,7 +49,7 @@ print(srm_weights.shape)
 # srm_weights=np.resize(srm_weights,(5,5,3,30))
 print(srm_weights.shape)
 ################################################## TLU ACTIVATION FUNCTION
-T3 = 3;
+T3 = 3
 
 
 def Tanh3(x):
@@ -170,7 +171,7 @@ def test(model,  X_test, y_test, batch_size, epochs, initial_epoch=0,
     #     os.makedirs(log_dir)
     # tensorboard = tf.keras.callbacks.TensorBoard(log_dir)
     # print("1111111111111111111111111111111111111111111111111111111111111111111111111111")
-    filepath = "/home/kevin2li/wave/myapps/project/sa/xunet/saved-model-117-0.85.hdf5"
+    filepath = "/home/likai/integrated_stega_paltform/project/sa/xunet/saved-model-117-0.85.hdf5"
     # checkpoint = tf.keras.callbacks.ModelCheckpoint(filepath, monitor='val_acc', save_best_only=False, mode='max')
     model.reset_states()
     print("filepath",filepath)
@@ -313,7 +314,7 @@ def load_images(path_pattern):
     print(X.shape)
     # X = np.resize(X,(7000,3, 512,512))
     print(X.shape)
-    X=  np.resize(X,(1000,1,256,256))
+    X=  np.resize(X,(20,1,256,256))
     print("load_imagesload_imagesload_imagesload_images", X.shape)
 
     X1 = X[:,:,:,:]
@@ -328,9 +329,9 @@ def load_images(path_pattern):
 
 # Train Images
 # Xc,Yc,Tc = load_images('D:/1\DAQIU\DLGP\Steganalysis/alaska-master/alaska2-image-steganalysis/00/*.jpg')
-Xc,Yc,Tc = load_images('/mnt/f/code/steganography_platform_pl/data/0/*.png')
+Xc,Yc,Tc = load_images('/home/likai/integrated_stega_paltform/project/sa/xunet/0/*.png')
 # Xs,Ys,Ts = load_images('D:/1\DAQIU\DLGP\Steganalysis/alaska-master/alaska2-image-steganalysis/33/*.jpg')
-Xs,Ys,Ts = load_images('/mnt/f/code/steganography_platform_pl/data/1/*.png')
+Xs,Ys,Ts = load_images('/home/likai/integrated_stega_paltform/project/sa/xunet/1/*.png')
 
 # print("Xc.shapeXc.shapeXc.shapeXc.shapeXc.shapeXc.shapeXc.shapeXc.shape",Xc.shape)
 # print("Xs.shapeXs.shapeXs.shapeXs.shapeXs.shapeXs.shapeXs.shapeXs.shape",Xs.shape)
