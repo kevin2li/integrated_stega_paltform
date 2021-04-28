@@ -1,44 +1,45 @@
 '''
 Author: 李大秋
 Date: 2021-04-21 21:10:07
-LastEditTime: 2021-04-23 15:22:09
-LastEditors: vscode
+LastEditTime: 2021-04-28 10:37:00
+LastEditors: Please set LastEditors
 Description: In User Settings Edit
 FilePath: /myapps/src/xunet/XuNet_Test.py
 '''
-
+# %%
+import glob
+import os
+import random
+import time as tm
+from time import time
+from tqdm import tqdm
+import cv2
+import matplotlib as mpl
+import matplotlib.colors as colors
+import matplotlib.pyplot as plt
 import numpy
 import numpy as np
-import random
-import os
-import matplotlib as mpl
-import matplotlib.pyplot as plt
-import matplotlib.colors as colors
-from keras.layers import Activation
+# from keras.layers import Activation
+# import tensorflow as tf1
 import tensorflow as tf
-import cv2c
-from tensorflow.keras.layers import Lambda, Layer, ReLU
-from tensorflow.keras.models import Sequential
-from tensorflow.keras.layers import Dense, Dropout, Activation, Flatten, LSTM, SpatialDropout2D, Concatenate
-from tensorflow.keras.layers import Conv2D, MaxPooling2D, AveragePooling2D, GlobalAveragePooling2D, UpSampling2D, \
-    BatchNormalization
-from keras.layers.core import Reshape
-from keras import optimizers
-from tensorflow.keras import regularizers
 from keras import Input, Model
-from time import time
-import time as tm
-from keras.initializers import Constant, RandomNormal, glorot_normal
-from tensorflow.keras.models import load_model
-from tensorflow.keras.regularizers import l2
 from keras import backend as K
-from tensorflow.keras.utils import plot_model
+from keras import optimizers
+from keras.initializers import Constant, RandomNormal, glorot_normal
 from keras.layers import concatenate
-import glob
-from skimage.util.shape import view_as_blocks
+from keras.layers.core import Reshape
 from keras.utils import np_utils
-
-
+# from skimage.util.shape import view_as_blocks
+from tensorflow.keras import regularizers
+from tensorflow.keras.layers import (LSTM, Activation, AveragePooling2D,
+                                     BatchNormalization, Concatenate, Conv2D,
+                                     Dense, Dropout, Flatten,
+                                     GlobalAveragePooling2D, Lambda, Layer,
+                                     MaxPooling2D, ReLU, SpatialDropout2D,
+                                     UpSampling2D)
+from tensorflow.keras.models import Sequential, load_model
+from tensorflow.keras.regularizers import l2
+from tensorflow.keras.utils import plot_model
 
 ################################################## 30 SRM FILTERS
 srm_weights = np.load('SRM_Kernels.npy')
@@ -164,12 +165,12 @@ def test(model,  X_test, y_test, batch_size, epochs, initial_epoch=0,
           model_name=""):
     start_time = tm.time()
     # tensorboard_dir = os.path.join('D:\\OneDrive - Lolihub\\DAQIU\\DLGP\\CrossDomain\\usual\\logs\\')
-    log_dir = "D:\\OneDrive - Lolihub\\DAQIU\\DLGP\\CrossDomain\\usual\\logs\\" + model_name + "_" +'1617771589.92243' #"1617420166.623087"
-    if not os.path.exists(log_dir):
-        os.makedirs(log_dir)
-    tensorboard = tf.keras.callbacks.TensorBoard(log_dir)
+    # log_dir = "D:\\OneDrive - Lolihub\\DAQIU\\DLGP\\CrossDomain\\usual\\logs\\" + model_name + "_" +'1617771589.92243' #"1617420166.623087"
+    # if not os.path.exists(log_dir):
+    #     os.makedirs(log_dir)
+    # tensorboard = tf.keras.callbacks.TensorBoard(log_dir)
     # print("1111111111111111111111111111111111111111111111111111111111111111111111111111")
-    filepath = log_dir + "\saved-model-373-0.60.hdf5"
+    filepath = "/home/kevin2li/wave/myapps/project/sa/xunet/saved-model-117-0.85.hdf5"
     # checkpoint = tf.keras.callbacks.ModelCheckpoint(filepath, monitor='val_acc', save_best_only=False, mode='max')
     model.reset_states()
     print("filepath",filepath)
@@ -183,7 +184,7 @@ def test(model,  X_test, y_test, batch_size, epochs, initial_epoch=0,
     # print("网络评估参数：---------------------------------------------------------------------------------------")
     # print(history.history.keys())
     model.summary()  #打印模型的概述信息
-    plot_model(model, log_dir+'/'+'model_plot.png')# 保存模型的基本结构图
+    # plot_model(model, log_dir+'/'+'model_plot.png')# 保存模型的基本结构图
 
     metrics = model.evaluate(X_test, y_test, verbose=0)
     print("test:metrics",metrics)
@@ -251,52 +252,54 @@ n = 512
 #     print("load_imagesload_imagesload_imagesload_images",X.shape)
 #     return X
 
-def load_images0(path_pattern):
-    print("path_patternpath_patternpath_patternpath_pattern:", path_pattern)
-    # im_files=glob.glob(os.path.join(path_pattern,'*.png'))
-    im_files = glob.glob(path_pattern)
-    # files=glob.glob(path_pattern)
-    print("im_filesim_filesim_filesim_filesim_filesim_files:", im_files)
+# def load_images0(path_pattern):
+#     print("path_patternpath_patternpath_patternpath_pattern:", path_pattern)
+#     # im_files=glob.glob(os.path.join(path_pattern,'*.png'))
+#     im_files = glob.glob(path_pattern)
+#     # files=glob.glob(path_pattern)
+#     print("im_filesim_filesim_filesim_filesim_filesim_files:", im_files)
 
-    X = []
-    Y = []
-    for f in im_files:
-        # print("fffffffffffffffffffffffffff",f)
-        I = cv2.imread(f,cv2.IMREAD_GRAYSCALE)
-        # print("IIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIII",I.shape)
-        patches = view_as_blocks(I, (n, n))
-        for i in range(patches.shape[0]):
-            for j in range(patches.shape[1]):
-                X.append([patches[i, j]])
-    X = numpy.array(X)
-    X=  np.resize(X,(7000,1,256,256))
-    print("load_imagesload_imagesload_imagesload_images", X.shape)
+#     X = []
+#     Y = []
+#     for f in im_files:
+#         # print("fffffffffffffffffffffffffff",f)
+#         I = cv2.imread(f,cv2.IMREAD_GRAYSCALE)
+#         # print("IIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIII",I.shape)
+#         patches = view_as_blocks(I, (n, n))
+#         for i in range(patches.shape[0]):
+#             for j in range(patches.shape[1]):
+#                 X.append([patches[i, j]])
+#     X = numpy.array(X)
+#     X=  np.resize(X,(7000,1,256,256))
+#     print("load_imagesload_imagesload_imagesload_images", X.shape)
 
-    X1 = X[:5000,:,:,:]
-    Y1 = X[5000:6000,:,:,:]
-    T1 = X[6000:,:,:,:]
-    print("X.shape--load_imagesload_imagesload_imagesload_images",X1.shape)
-    print("Y.shape--load_imagesload_imagesload_imagesload_images",Y1.shape)
-    print("T1.shape--load_imagesload_imagesload_imagesload_images", T1.shape)
-    # X1 =X1.resize()
-    # Y1 =Y1.resize()
-    return X1,Y1,T1
+#     X1 = X[:5000,:,:,:]
+#     Y1 = X[5000:6000,:,:,:]
+#     T1 = X[6000:,:,:,:]
+#     print("X.shape--load_imagesload_imagesload_imagesload_images",X1.shape)
+#     print("Y.shape--load_imagesload_imagesload_imagesload_images",Y1.shape)
+#     print("T1.shape--load_imagesload_imagesload_imagesload_images", T1.shape)
+#     # X1 =X1.resize()
+#     # Y1 =Y1.resize()
+#     return X1,Y1,T1
 
 def load_images(path_pattern):
     print("path_patternpath_patternpath_patternpath_pattern:", path_pattern)
     # im_files=glob.glob(os.path.join(path_pattern,'*.png'))
     im_files = glob.glob(path_pattern)
     # files=glob.glob(path_pattern)
-    print("im_filesim_filesim_filesim_filesim_filesim_files:", im_files)
+    # print("im_filesim_filesim_filesim_filesim_filesim_files:", im_files)
 
     X = []
     Y = []
-    for f in im_files:
+    progressbar = tqdm(im_files, total=len(im_files), desc='reading images')
+    for f in progressbar:
         # print("fffffffffffffffffffffffffff",f)
         I = cv2.imread(f,cv2.IMREAD_GRAYSCALE)
-        print("IIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIII", I.shape)
+        progressbar.set_postfix({'shape': I.shape})
+        # print("IIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIII", I.shape)
         # I = np.resize(I, ( 3, 512, 512))
-        print("IIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIII",I.shape)
+        # print("IIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIII",I.shape)
         # print("IIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIII",I.shape)
         # patches = view_as_blocks(I, (n, n))
         # print("patchespatchespatchespatchespatches",patches.shape)
@@ -310,12 +313,12 @@ def load_images(path_pattern):
     print(X.shape)
     # X = np.resize(X,(7000,3, 512,512))
     print(X.shape)
-    X=  np.resize(X,(2000,1,256,256))
+    X=  np.resize(X,(1000,1,256,256))
     print("load_imagesload_imagesload_imagesload_images", X.shape)
 
     X1 = X[:,:,:,:]
-    Y1 = X[:1000,:,:,:]
-    T1 = X[1000:,:,:,:]
+    Y1 = X[:,:,:,:]
+    T1 = X[:,:,:,:]
     print("X.shape--load_imagesload_imagesload_imagesload_images",X1.shape)
     print("Y.shape--load_imagesload_imagesload_imagesload_images",Y1.shape)
     print("T1.shape--load_imagesload_imagesload_imagesload_images", T1.shape)
@@ -324,10 +327,10 @@ def load_images(path_pattern):
     return X1,Y1,T1
 
 # Train Images
-Xc,Yc,Tc = load_images('D:/1\DAQIU\DLGP\Steganalysis/alaska-master/alaska2-image-steganalysis/00/*.jpg')
-# Xc,Yc,Tc = load_images('D:\OneDrive - Lolihub\DAQIU\Desktop\DataSet/COVER1/*.png')
-Xs,Ys,Ts = load_images('D:/1\DAQIU\DLGP\Steganalysis/alaska-master/alaska2-image-steganalysis/33/*.jpg')
-# Xs,Ys,Ts = load_images('D:\OneDrive - Lolihub\DAQIU\Desktop\DataSet/WOWstego(0.4)/*.png')
+# Xc,Yc,Tc = load_images('D:/1\DAQIU\DLGP\Steganalysis/alaska-master/alaska2-image-steganalysis/00/*.jpg')
+Xc,Yc,Tc = load_images('/mnt/f/code/steganography_platform_pl/data/0/*.png')
+# Xs,Ys,Ts = load_images('D:/1\DAQIU\DLGP\Steganalysis/alaska-master/alaska2-image-steganalysis/33/*.jpg')
+Xs,Ys,Ts = load_images('/mnt/f/code/steganography_platform_pl/data/1/*.png')
 
 # print("Xc.shapeXc.shapeXc.shapeXc.shapeXc.shapeXc.shapeXc.shapeXc.shape",Xc.shape)
 # print("Xs.shapeXs.shapeXs.shapeXs.shapeXs.shapeXs.shapeXs.shapeXs.shape",Xs.shape)
