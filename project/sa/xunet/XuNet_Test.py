@@ -1,7 +1,7 @@
 '''
 Author: 李大秋
 Date: 2021-04-21 21:10:07
-LastEditTime: 2021-04-28 10:37:00
+LastEditTime: 2021-04-28 16:02:13
 LastEditors: Please set LastEditors
 Description: In User Settings Edit
 FilePath: /myapps/src/xunet/XuNet_Test.py
@@ -12,7 +12,7 @@ import os
 import random
 import time as tm
 from time import time
-from tqdm import tqdm
+
 import cv2
 import matplotlib as mpl
 import matplotlib.colors as colors
@@ -40,6 +40,7 @@ from tensorflow.keras.layers import (LSTM, Activation, AveragePooling2D,
 from tensorflow.keras.models import Sequential, load_model
 from tensorflow.keras.regularizers import l2
 from tensorflow.keras.utils import plot_model
+from tqdm import tqdm
 
 ################################################## 30 SRM FILTERS
 srm_weights = np.load('SRM_Kernels.npy')
@@ -48,7 +49,7 @@ print(srm_weights.shape)
 # srm_weights=np.resize(srm_weights,(5,5,3,30))
 print(srm_weights.shape)
 ################################################## TLU ACTIVATION FUNCTION
-T3 = 3;
+T3 = 3
 
 
 def Tanh3(x):

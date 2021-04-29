@@ -1,7 +1,7 @@
 '''
 Author: your name
 Date: 2021-04-22 11:08:05
-LastEditTime: 2021-04-28 13:15:57
+LastEditTime: 2021-04-28 19:01:16
 LastEditors: Please set LastEditors
 Description: In User Settings Edit
 FilePath: /myapps/web/imgae_steganalysis.py
@@ -12,12 +12,12 @@ sys.path.append(os.path.abspath('..'))
 from pathlib import Path
 
 import pandas as pd
-
+import numpy as np
 import torch
 import torch.nn.functional as F
 from h2o_wave import Q, app, handle_on, main, on, ui, data
 from icecream import ic
-from project.sa import YedNet, ZhuNet
+from project.sa import YedNet, ZhuNet, XuNet
 from pathlib import Path
 from web.utils import *
 
@@ -87,7 +87,7 @@ async def image_start_analysis(q:Q):
     if suspect_img_path and options:
         FLAG = False
         for i in options:
-            if i not in ('ZhuNet', 'YedNet'):
+            if i not in ('ZhuNet', 'YedNet', 'XuNet'):
                 FLAG = True
                 break
         if FLAG:
@@ -96,19 +96,34 @@ async def image_start_analysis(q:Q):
                 ui.buttons([ui.button(name='sure', label='确定', primary=True)])
             ])
         else:
-            img = img_preprocess(suspect_img_path)
-            ic(img.shape)
             result = {}
             for model_name in options:
+                version = 'torch'
+                img = img_preprocess(suspect_img_path)
                 model = eval(model_name)()
+                
+                # load weights
                 if model_name == 'ZhuNet':
                     model = model.load_from_checkpoint(str(root_dir / 'project/sa/zhunet/zhunet-epoch=210-val_loss=0.44-val_acc=0.85.ckpt'))
                 elif model_name == 'YedNet':
                     model = model.load_from_checkpoint(str(root_dir / 'project/sa/yednet/epoch=247-val_loss=0.48-val_acc=0.81.ckpt'))
-                    
-                model.eval()
-                out = model(img)
-                out = F.softmax(out, dim=-1).squeeze()
+                elif model_name == 'XuNet': # tf implemented currently
+                    version = 'tf'
+                    img = np.array(Image.open(suspect_img_path))
+                    model.load_weights(str(root_dir / 'project/sa/xunet/saved-model-117-0.85.hdf5'))
+                elif model_name == 'SRNet':
+                    pass
+                elif model_name == 'YeNet':
+                    pass
+                
+                # predict
+                if version == 'torch':
+                    model.eval()
+                    out = model(img)
+                    out = F.softmax(out, dim=-1).squeeze()
+                elif version == 'tf':
+                    out = model(img).squeeze()
+
                 result[i] = out.tolist()
                 
             ic(result)
