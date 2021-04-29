@@ -6,7 +6,10 @@ LastEditors: Please set LastEditors
 Description: In User Settings Edit
 FilePath: /myapps/src/xunet/XuNet_Test.py
 '''
-# %%
+import os
+import sys
+sys.path.append(os.path.abspath('../../..'))
+
 from pathlib import Path
 import glob
 
@@ -22,10 +25,7 @@ from tensorflow.keras.layers import (AveragePooling2D, BatchNormalization,
                                      Concatenate, Conv2D, Dense,
                                      GlobalAveragePooling2D, Lambda, ReLU)
 from tqdm import tqdm
-
-root_dir = Path('/home/kevin2li/wave/myapps/')  # wsl
-# root_dir = Path('/root/wave/myapp')  # aliyun
-# root_dir = Path('/home/likai/integrated_stega_paltform/') # lab
+from project import root_dir
 
 srm_weights = np.load(str(root_dir / 'project/sa/xunet/SRM_Kernels.npy'))
 biasSRM = numpy.ones(30)
