@@ -1,7 +1,7 @@
 '''
 Author: 李大秋
 Date: 2021-04-21 21:10:07
-LastEditTime: 2021-04-28 16:02:13
+LastEditTime: 2021-04-28 19:54:51
 LastEditors: Please set LastEditors
 Description: In User Settings Edit
 FilePath: /myapps/src/xunet/XuNet_Test.py
@@ -12,7 +12,7 @@ import os
 import random
 import time as tm
 from time import time
-
+from tqdm import tqdm
 import cv2
 import matplotlib as mpl
 import matplotlib.colors as colors
@@ -40,7 +40,6 @@ from tensorflow.keras.layers import (LSTM, Activation, AveragePooling2D,
 from tensorflow.keras.models import Sequential, load_model
 from tensorflow.keras.regularizers import l2
 from tensorflow.keras.utils import plot_model
-from tqdm import tqdm
 
 ################################################## 30 SRM FILTERS
 srm_weights = np.load('SRM_Kernels.npy')
@@ -171,7 +170,7 @@ def test(model,  X_test, y_test, batch_size, epochs, initial_epoch=0,
     #     os.makedirs(log_dir)
     # tensorboard = tf.keras.callbacks.TensorBoard(log_dir)
     # print("1111111111111111111111111111111111111111111111111111111111111111111111111111")
-    filepath = "/home/likai/integrated_stega_paltform/project/sa/xunet/saved-model-117-0.85.hdf5"
+    filepath = "/home/kevin2li/wave/myapps/project/sa/xunet/saved-model-117-0.85.hdf5"
     # checkpoint = tf.keras.callbacks.ModelCheckpoint(filepath, monitor='val_acc', save_best_only=False, mode='max')
     model.reset_states()
     print("filepath",filepath)
@@ -329,9 +328,9 @@ def load_images(path_pattern):
 
 # Train Images
 # Xc,Yc,Tc = load_images('D:/1\DAQIU\DLGP\Steganalysis/alaska-master/alaska2-image-steganalysis/00/*.jpg')
-Xc,Yc,Tc = load_images('/home/likai/integrated_stega_paltform/project/sa/xunet/0/*.png')
+Xc,Yc,Tc = load_images('/mnt/f/code/steganography_platform_pl/data/0/*.png')
 # Xs,Ys,Ts = load_images('D:/1\DAQIU\DLGP\Steganalysis/alaska-master/alaska2-image-steganalysis/33/*.jpg')
-Xs,Ys,Ts = load_images('/home/likai/integrated_stega_paltform/project/sa/xunet/1/*.png')
+Xs,Ys,Ts = load_images('/mnt/f/code/steganography_platform_pl/data/1/*.png')
 
 # print("Xc.shapeXc.shapeXc.shapeXc.shapeXc.shapeXc.shapeXc.shapeXc.shape",Xc.shape)
 # print("Xs.shapeXs.shapeXs.shapeXs.shapeXs.shapeXs.shapeXs.shapeXs.shape",Xs.shape)
@@ -391,3 +390,5 @@ historu_name, history = test(model, X_test, y_test,batch_size=64, epochs=600,
                    model_name=name)
 # print("historu_name:",historu_name)
 # print("history:",history)
+
+# %%

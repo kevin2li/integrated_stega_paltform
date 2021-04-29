@@ -1,18 +1,27 @@
 '''
 Author: 李大秋
 Date: 2021-04-21 21:10:07
-LastEditTime: 2021-04-28 19:07:09
+LastEditTime: 2021-04-28 20:00:15
 LastEditors: Please set LastEditors
 Description: In User Settings Edit
 FilePath: /myapps/src/xunet/XuNet_Test.py
 '''
 # %%
 from pathlib import Path
+import glob
+
+import cv2
 import numpy
 import numpy as np
 import tensorflow as tf
+import tqdm
 from keras import backend as K
-from tensorflow.keras.layers import (AveragePooling2D, BatchNormalization, Concatenate, Conv2D, Dense, GlobalAveragePooling2D, Lambda, ReLU)
+from keras.utils import np_utils
+from PIL import Image
+from tensorflow.keras.layers import (AveragePooling2D, BatchNormalization,
+                                     Concatenate, Conv2D, Dense,
+                                     GlobalAveragePooling2D, Lambda, ReLU)
+from tqdm import tqdm
 
 root_dir = Path('/home/kevin2li/wave/myapps/')  # wsl
 # root_dir = Path('/root/wave/myapp')  # aliyun
@@ -27,7 +36,6 @@ def Tanh3(x):
     return tanh3
 
 # %%
-# def XuNet(img_size=256, compile=True):
 class XuNet():
     def __init__(self, img_size=256):
         tf.keras.backend.clear_session()
@@ -111,9 +119,18 @@ class XuNet():
         predictions = Dense(2, activation="softmax", name="output_1", kernel_regularizer=tf.keras.regularizers.l2(0.0001),
                             bias_regularizer=tf.keras.regularizers.l2(0.0001))(layers)
         self.model = tf.keras.Model(inputs=inputs, outputs=predictions)
-    
+        # Compile
+        optimizer = tf.keras.optimizers.SGD(learning_rate=0.005, momentum=0.95)
+
+        self.model.compile(optimizer=optimizer, loss='binary_crossentropy', metrics=['acc'])
+
     def load_weights(self, path: str) -> None:
+        self.model.reset_states()
         self.model.load_weights(path)
+
+    def evaluate(self, X_test, Y_test, verbose=None):
+        out = self.model.evaluate(X_test, Y_test)
+        return out
 
     def __call__(self, img: np.ndarray):
         assert len(img.shape) == 2, 'input should be gray image'
@@ -124,9 +141,79 @@ class XuNet():
         
 # %%
 # model = XuNet()
+#     model.reset_states()
 # model.load_weights('/home/kevin2li/wave/myapps/project/sa/xunet/saved-model-117-0.85.hdf5')
-# path = '/mnt/f/code/steganography_platform_pl/data/0/19.png'
-# img = np.array(Image.open(path))
+# # path = '/mnt/f/code/steganography_platform_pl/data/0/19.png'
+# # img = np.array(Image.open(path))
 # out = model(img)
 # out
 # %%
+# def load_images(path_pattern):
+#     print("path_patternpath_patternpath_patternpath_pattern:", path_pattern)
+#     # im_files=glob.glob(os.path.join(path_pattern,'*.png'))
+#     im_files = glob.glob(path_pattern)
+#     # files=glob.glob(path_pattern)
+#     # print("im_filesim_filesim_filesim_filesim_filesim_files:", im_files)
+
+#     X = []
+#     Y = []
+#     progressbar = tqdm(im_files, total=len(im_files), desc='reading images')
+#     for f in progressbar:
+#         # print("fffffffffffffffffffffffffff",f)
+#         I = np.array(Image.open(f))
+#         progressbar.set_postfix({'shape': I.shape})
+#         # print("IIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIII", I.shape)
+#         # I = np.resize(I, ( 3, 512, 512))
+#         # print("IIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIII",I.shape)
+#         # print("IIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIII",I.shape)
+#         # patches = view_as_blocks(I, (n, n))
+#         # print("patchespatchespatchespatchespatches",patches.shape)
+
+#         # for i in range(patches.shape[0]):
+#         #     for j in range(patches.shape[1]):
+#         #         X.append([patches[i, j]])
+#         X.append(I)
+#     # print(X)
+#     X = numpy.array(X)
+#     print(X.shape)
+#     # X = np.resize(X,(7000,3, 512,512))
+#     print(X.shape)
+#     X=  np.resize(X,(20,1,256,256))
+#     print("load_imagesload_imagesload_imagesload_images", X.shape)
+
+#     X1 = X[:,:,:,:]
+#     Y1 = X[:,:,:,:]
+#     T1 = X[:,:,:,:]
+#     print("X.shape--load_imagesload_imagesload_imagesload_images",X1.shape)
+#     print("Y.shape--load_imagesload_imagesload_imagesload_images",Y1.shape)
+#     print("T1.shape--load_imagesload_imagesload_imagesload_images", T1.shape)
+#     # X1 =X1.resize()
+#     # Y1 =Y1.resize()
+#     return X1,Y1,T1
+
+# Xc,Yc,Tc = load_images('/mnt/f/code/steganography_platform_pl/data/0/*.png')
+# # Xs,Ys,Ts = load_images('D:/1\DAQIU\DLGP\Steganalysis/alaska-master/alaska2-image-steganalysis/33/*.jpg')
+# Xs,Ys,Ts = load_images('/mnt/f/code/steganography_platform_pl/data/1/*.png')
+
+# X = (numpy.vstack((Xc, Xs)))
+# Y = (numpy.vstack((Yc, Ys)))
+# T = (numpy.vstack((Tc, Ts)))
+# # print("xxxxxxxxxxxxxxxxxxxxxxxxx",X.shape)
+# # print("yyyyyyyyyyyyyyyyyyyyyyyyy",Y.shape)
+
+# Xt = (numpy.hstack(([0] * len(Xc), [1] * len(Xs))))
+# Yt = (numpy.hstack(([0] * len(Yc), [1] * len(Ys))))
+# Tt = (numpy.hstack(([0] * len(Tc), [1] * len(Ts))))
+
+# Xt = np_utils.to_categorical(Xt, 2)
+# Yt = np_utils.to_categorical(Yt, 2)
+# Tt = np_utils.to_categorical(Tt, 2)
+# T = np.rollaxis(T, 1, 4) 
+
+# model = XuNet()
+# model.load_weights('/home/kevin2li/wave/myapps/project/sa/xunet/saved-model-117-0.85.hdf5')
+# # path = '/mnt/f/code/steganography_platform_pl/data/0/19.png'
+# # img = np.array(Image.open(path))
+# metrics = model.evaluate(T, Tt, verbose=0)
+# print("test:metrics",metrics)
+# # %%
