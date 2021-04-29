@@ -1,7 +1,7 @@
 '''
-Author: your name
+Author: Kevin Li
 Date: 2021-04-22 11:08:05
-LastEditTime: 2021-04-29 17:52:57
+LastEditTime: 2021-04-29 17:57:13
 LastEditors: Please set LastEditors
 Description: In User Settings Edit
 FilePath: /myapps/web/imgae_steganalysis.py
@@ -9,6 +9,7 @@ FilePath: /myapps/web/imgae_steganalysis.py
 import os
 import sys
 sys.path.append(os.path.abspath('..'))
+from pathlib import Path
 
 import pandas as pd
 import numpy as np
@@ -20,9 +21,8 @@ from project.sa import YedNet, ZhuNet, XuNet
 from pathlib import Path
 import matplotlib.pyplot as plt
 from web.utils import *
-root_dir = Path('/home/kevin2li/wave/myapps/')  # wsl
-# root_dir = Path('/root/wave/myapp')  # aliyun
-# root_dir = Path('/home/likai/integrated_stega_paltform/') # lab
+from project import root_dir
+
 #================================================================
 # 图像隐写分析
 #================================================================
