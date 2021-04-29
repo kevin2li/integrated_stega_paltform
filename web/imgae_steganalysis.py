@@ -1,7 +1,7 @@
 '''
 Author: Kevin Li
 Date: 2021-04-22 11:08:05
-LastEditTime: 2021-04-29 17:57:13
+LastEditTime: 2021-04-29 18:27:52
 LastEditors: Please set LastEditors
 Description: In User Settings Edit
 FilePath: /myapps/web/imgae_steganalysis.py
@@ -29,12 +29,12 @@ from project import root_dir
 @on()
 async def image_instance_level(q:Q):
     q.page['meta'] = layout2
-    q.page['content_left'] = ui.form_card(box=ui.box('content_left', order=2, height='550px'), title='Inputs', items=[
+    q.page['content_left'] = ui.form_card(box=ui.box('content_left', order=2, height='100%'), title='Inputs', items=[
         ui.text('**上传可疑图片:**'),
         ui.file_upload(name='suspect_img', label='上传', multiple=False, file_extensions=['png', 'jpg', 'jpeg'], max_file_size=10, max_size=15, height='200px'),
         ui.expander(name='expander', label='高级选项', items=[
             ui.dropdown('source', label='数据集:', value='WOW', required=True, choices=[
-                ui.choice(name=x, label=x) for x in ['WOW', 'S-UNIWARD', 'HILL', 'HUGO', 'MG', 'MVG', 'UT-GAN', 'SUI']
+                ui.choice(name=x, label=x) for x in ['WOW', 'S-UNIWARD', 'HILL', 'HUGO', 'MG', 'MVG', 'UT-GAN', 'MiPOD']
             ]),
             ui.dropdown('embedding_rate', label='嵌入率:', value='0.4 bpp', required=True, choices=[
                 ui.choice(name=x, label=x) for x in ['0.2 bpp', '0.4 bpp', '0.6 bpp', '0.8 bpp']
@@ -56,7 +56,7 @@ async def image_instance_level(q:Q):
 
 @on()
 async def image_dataset_level(q:Q):
-    q.page['content_left'] = ui.form_card(box=ui.box('content_left', order=2, height='550px'), title='Inputs', items=[
+    q.page['content_left'] = ui.form_card(box=ui.box('content_left', order=2, height='100%'), title='Inputs', items=[
         ui.dropdown(name='options2', label='数据集', required=True, values=['S-UNIWARD 0.4bpp'], choices=[ui.choice(name=x, label=x) for x in ['S-UNIWARD 0.4bpp', 'WOW 0.4bpp', 'HUGO 0.4bpp']]),
         ui.dropdown(name='options3', label='隐写分析模型', required=True, values=['SRNet'], choices=[ui.choice(name=x, label=x) for x in ['SRNet', 'ZhuNet', 'YedNet', 'SRM']]),
         ui.button('start_dataset_analysis', label='开始检测', primary=True)
@@ -90,7 +90,7 @@ async def image_start_analysis(q:Q):
                 break
         if FLAG:
             q.page['meta'].dialog = ui.dialog(title='error', items=[
-                ui.text('对不起，暂不支持全部所选模型, 目前仅支持ZhuNet和YedNet!'),
+                ui.text('对不起，暂不支持全部所选模型'),
                 ui.buttons([ui.button(name='sure', label='确定', primary=True)])
             ])
         else:

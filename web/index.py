@@ -66,7 +66,12 @@ async def menu_index(q:Q):
             # ui.tab('#menu/download_section', '下载专区'),
         ])
         q.page['v_nav'] = ui.nav_card(
-            box=ui.box('sidebar', height='100%'),
+            box=ui.boxes(
+                ui.box('sidebar', height='100%'),
+                ui.box('sidebar', height='100%'),
+                ui.box('sidebar', height='600px'),
+                ui.box('sidebar', height='800px'),
+                ),
             value='#menu/index',
             items=[
                 ui.nav_group('Menu', items=[
