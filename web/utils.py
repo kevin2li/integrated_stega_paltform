@@ -192,6 +192,7 @@ def plot_group_bars(result: dict):
     rects2 = ax.bar(x + width/2, df.iloc[1], width, label='stego')
 
     # Add some text for labels, title and custom x-axis tick labels, etc.
+    ax.set_xlabel('model')
     ax.set_ylabel('probality')
     ax.set_title('predict results')
     ax.set_xticks(x)

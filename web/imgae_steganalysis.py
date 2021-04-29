@@ -1,7 +1,7 @@
 '''
 Author: Kevin Li
 Date: 2021-04-22 11:08:05
-LastEditTime: 2021-04-29 18:27:52
+LastEditTime: 2021-04-29 20:20:56
 LastEditors: Please set LastEditors
 Description: In User Settings Edit
 FilePath: /myapps/web/imgae_steganalysis.py
@@ -51,6 +51,7 @@ async def image_instance_level(q:Q):
     q.page['content_right'] = ui.form_card(box=ui.box('content_right', order=2), title='Outputs', items=[
         # ui.text('1111'),
     ])
+    
     await q.page.save()
 
 
@@ -80,6 +81,7 @@ async def suspect_img(q:Q):
 async def image_start_analysis(q:Q):
     suspect_img_path = q.client.suspect_img_path
     options = q.args['options']
+    q.page['content_left'].items[3].dropdown.values=options
     ic(suspect_img_path)
     ic(options)
     if suspect_img_path and options:
