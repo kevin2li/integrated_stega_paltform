@@ -85,6 +85,11 @@ async def menu_index(q:Q):
         q.page['content'] = ui.form_card(box='content', items=[
             # ui.text('正在开发中...'),
         ])
+        
+        # q.page['footer'] = ui.form_card(box='footer', items=[
+        #     ui.text('nuist')
+        # ])
+
         q.client.initialized = True
         await q.page.save()
     else:
@@ -101,8 +106,8 @@ async def menu_index(q:Q):
             # ui.tab('#menu/download_section', '下载专区'),
 
         ])
-        image_path, = await q.site.upload(['/home/kevin2li/wave/myapps/web/upload/2.png'])
-        q.page['content'] = ui.markdown_card(box='content', title='首页', content=f'![plot]({image_path})')
+        # image_path, = await q.site.upload(['/home/kevin2li/wave/myapps/web/upload/2.png'])
+        # q.page['content'] = ui.markdown_card(box='content', title='首页', content=f'![plot]({image_path})')
         await q.page.save()
 
 @on(arg='#menu/image_stega')
@@ -110,11 +115,15 @@ async def menu_image_stega(q:Q):
     q.page['meta'] = layout1
     q.page['v_nav'].value = '#menu/image_stega'
     q.page['tab_bar'] = ui.tab_card(box='tab_bar', items=[
-        ui.tab('image_embed', '嵌入'),
-        ui.tab('image_extract', '提取'),
+        ui.tab('image_embed', '自适应隐写'),
+        ui.tab('image_watermark', '数字水印'),
+        ui.tab('image_hiding', '以图藏图'),
+        # ui.tab('image_embed', '嵌入'),
+        # ui.tab('image_extract', '提取'),
         # ui.tab('image_watermark', '数字水印'),
     ])
-    await image_embed(q)
+    q.page['content'] = ui.form_card(box=ui.box('content'), items=[], title='')
+    await q.page.save()
 
 @on(arg='#menu/image_steganalysis')
 async def menu_image_steganalysis(q:Q):

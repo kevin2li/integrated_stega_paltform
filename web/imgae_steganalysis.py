@@ -1,7 +1,7 @@
 '''
 Author: Kevin Li
 Date: 2021-04-22 11:08:05
-LastEditTime: 2021-04-29 20:20:56
+LastEditTime: 2021-05-06 19:34:13
 LastEditors: Please set LastEditors
 Description: In User Settings Edit
 FilePath: /myapps/web/imgae_steganalysis.py
@@ -33,6 +33,9 @@ async def image_instance_level(q:Q):
         ui.text('**上传可疑图片:**'),
         ui.file_upload(name='suspect_img', label='上传', multiple=False, file_extensions=['png', 'jpg', 'jpeg'], max_file_size=10, max_size=15, height='200px'),
         ui.expander(name='expander', label='高级选项', items=[
+            ui.dropdown('framework', label='框架:', value='pytorch', required=True, choices=[
+                ui.choice(name=x, label=x) for x in ['pytorch', 'tensorflow']
+            ]),
             ui.dropdown('source', label='数据集:', value='WOW', required=True, choices=[
                 ui.choice(name=x, label=x) for x in ['WOW', 'S-UNIWARD', 'HILL', 'HUGO', 'MG', 'MVG', 'UT-GAN', 'MiPOD']
             ]),
@@ -46,7 +49,7 @@ async def image_instance_level(q:Q):
         # ui.checklist(name='checklist', label='隐写分析模型',
         #                 choices=[ui.choice(name=x, label=x) for x in ['SRNet', 'ZhuNet', 'YedNet', 'XuNet', 'SRM', 'A', 'B', 'C', 'D', 'E', 'F']]),
 
-        ui.button('image_start_analysis', label='开始检测', primary=True)
+        ui.button('image_start_analysis', label='开始检测', primary=True, disabled=True)
     ])
     q.page['content_right'] = ui.form_card(box=ui.box('content_right', order=2), title='Outputs', items=[
         # ui.text('1111'),
@@ -74,7 +77,7 @@ async def suspect_img(q:Q):
         q.client.suspect_img_path = local_path
         ic(local_path)
         q.page['content_left'].items[1].file_upload.label = '已上传'
-        ic(vars(q.page))
+        q.page['content_left'].items[4].button.disabled = False
     await q.page.save()
 
 @on()
@@ -140,13 +143,13 @@ async def image_start_analysis(q:Q):
             ic(image_path)
             os.remove('bar.png')
             q.page['content_right'] = ui.markdown_card(box=ui.box('content_right'), title='Outputs',
-                content=f'![plot]({image_path})'
+                content=f"image: {suspect_img_path.split('/')[-1]} ![plot]({image_path})"
             )
             q.page['content_left'].items[1].file_upload.label = '上传'
-            # del q.client.suspect_img_path
+            q.page['content_left'].items[4].button.disabled = True
     else:
         q.page['meta'].dialog = ui.dialog(title='error', items=[
-            ui.text('对不起，请检查是否输入完整!'),
+            ui.text('对不起，请上传图片!'),
             ui.buttons([ui.button(name='sure', label='确定', primary=True)])
         ])
     await q.page.save()

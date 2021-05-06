@@ -196,4 +196,14 @@ async def watermarked(q:Q):
             ui.link('下载', path=out_path, button=True)
         ])
     await q.page.save()
-    
+
+
+#================================================================
+# 以图藏图
+#================================================================
+@on()
+async def image_hiding(q:Q):
+    q.page['content'] = ui.form_card(box=ui.box('content'), title='', items=[
+        ui.text("以图藏图")
+    ])
+    await q.page.save()
