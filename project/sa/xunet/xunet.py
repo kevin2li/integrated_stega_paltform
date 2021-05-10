@@ -14,9 +14,9 @@ import tensorflow as tf
 from keras import backend as K
 from tensorflow.keras.layers import (AveragePooling2D, BatchNormalization, Concatenate, Conv2D, Dense, GlobalAveragePooling2D, Lambda, ReLU)
 
-root_dir = Path('/home/kevin2li/wave/myapps/')  # wsl
+# root_dir = Path('/home/kevin2li/wave/myapps/')  # wsl
 # root_dir = Path('/root/wave/myapp')  # aliyun
-# root_dir = Path('/home/likai/integrated_stega_paltform/') # lab
+root_dir = Path('/home/likai/integrated_stega_paltform/') # lab
 
 srm_weights = np.load(str(root_dir / 'project/sa/xunet/SRM_Kernels.npy'))
 biasSRM = numpy.ones(30)
