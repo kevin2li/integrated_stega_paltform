@@ -1,3 +1,11 @@
+'''
+Author: your name
+Date: 2021-04-22 11:29:33
+LastEditTime: 2021-05-05 13:39:08
+LastEditors: your name
+Description: In User Settings Edit
+FilePath: /myapps/web/text_steganography.py
+'''
 import os
 import sys
 sys.path.append(os.path.abspath('..'))
@@ -30,7 +38,6 @@ async def text_embed(q:Q):
 @on()
 async def text_extract(q:Q):
     q.page['meta'] = layout2
-    q.page['v_nav'].value = '#menu/steganography'
     # q.page['content'] = ui.form_card(box='content', items=[
     #     ui.text('正在开发中...')
     # ])

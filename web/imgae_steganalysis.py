@@ -1,7 +1,7 @@
 '''
-Author: your name
+Author: Kevin Li
 Date: 2021-04-22 11:08:05
-LastEditTime: 2021-04-28 19:01:16
+LastEditTime: 2021-05-06 19:34:13
 LastEditors: Please set LastEditors
 Description: In User Settings Edit
 FilePath: /myapps/web/imgae_steganalysis.py
@@ -9,6 +9,7 @@ FilePath: /myapps/web/imgae_steganalysis.py
 import os
 import sys
 sys.path.append(os.path.abspath('..'))
+from pathlib import Path
 
 import pandas as pd
 import numpy as np
@@ -16,27 +17,30 @@ import torch
 import torch.nn.functional as F
 from h2o_wave import Q, app, handle_on, main, on, ui, data
 from icecream import ic
-from project.sa import YedNet, ZhuNet, XuNet
+from project.steganalysis import YedNet, ZhuNet, XuNet
 from pathlib import Path
+import matplotlib.pyplot as plt
 from web.utils import *
-# root_dir = Path('/home/kevin2li/wave/myapps/')  # wsl
-# root_dir = Path('/root/wave/myapp')  # aliyun
-root_dir = Path('/home/likai/integrated_stega_paltform/') # lab
+from project import root_dir
+
 #================================================================
 # 图像隐写分析
 #================================================================
 @on()
 async def image_instance_level(q:Q):
     q.page['meta'] = layout2
-    q.page['content_left'] = ui.form_card(box=ui.box('content_left', order=2, height='550px'), title='Inputs', items=[
+    q.page['content_left'] = ui.form_card(box=ui.box('content_left', order=2, height='100%'), title='Inputs', items=[
         ui.text('**上传可疑图片:**'),
         ui.file_upload(name='suspect_img', label='上传', multiple=False, file_extensions=['png', 'jpg', 'jpeg'], max_file_size=10, max_size=15, height='200px'),
         ui.expander(name='expander', label='高级选项', items=[
-            ui.dropdown('source', label='数据集:', value='cover', required=True, choices=[
-                ui.choice(name=x, label=x) for x in ['cover', 'wow', 'suniward', 'hill', 'hugo', 'juniward', 'uerd', 'ut-gan', 'jmipod']
+            ui.dropdown('framework', label='框架:', value='pytorch', required=True, choices=[
+                ui.choice(name=x, label=x) for x in ['pytorch', 'tensorflow']
+            ]),
+            ui.dropdown('source', label='数据集:', value='WOW', required=True, choices=[
+                ui.choice(name=x, label=x) for x in ['WOW', 'S-UNIWARD', 'HILL', 'HUGO', 'MG', 'MVG', 'UT-GAN', 'MiPOD']
             ]),
             ui.dropdown('embedding_rate', label='嵌入率:', value='0.4 bpp', required=True, choices=[
-                ui.choice(name=x, label=x) for x in ['0', '0.2 bpp', '0.4 bpp', '0.6 bpp', '0.8 bpp']
+                ui.choice(name=x, label=x) for x in ['0.2 bpp', '0.4 bpp', '0.6 bpp', '0.8 bpp']
             ]),
         ]),
         ui.dropdown('options', label='隐写分析模型:', values=['SRNet'], required=True, choices=[
@@ -45,17 +49,18 @@ async def image_instance_level(q:Q):
         # ui.checklist(name='checklist', label='隐写分析模型',
         #                 choices=[ui.choice(name=x, label=x) for x in ['SRNet', 'ZhuNet', 'YedNet', 'XuNet', 'SRM', 'A', 'B', 'C', 'D', 'E', 'F']]),
 
-        ui.button('image_start_analysis', label='开始检测', primary=True)
+        ui.button('image_start_analysis', label='开始检测', primary=True, disabled=True)
     ])
     q.page['content_right'] = ui.form_card(box=ui.box('content_right', order=2), title='Outputs', items=[
         # ui.text('1111'),
     ])
+    
     await q.page.save()
 
 
 @on()
 async def image_dataset_level(q:Q):
-    q.page['content_left'] = ui.form_card(box=ui.box('content_left', order=2, height='550px'), title='Inputs', items=[
+    q.page['content_left'] = ui.form_card(box=ui.box('content_left', order=2, height='100%'), title='Inputs', items=[
         ui.dropdown(name='options2', label='数据集', required=True, values=['S-UNIWARD 0.4bpp'], choices=[ui.choice(name=x, label=x) for x in ['S-UNIWARD 0.4bpp', 'WOW 0.4bpp', 'HUGO 0.4bpp']]),
         ui.dropdown(name='options3', label='隐写分析模型', required=True, values=['SRNet'], choices=[ui.choice(name=x, label=x) for x in ['SRNet', 'ZhuNet', 'YedNet', 'SRM']]),
         ui.button('start_dataset_analysis', label='开始检测', primary=True)
@@ -72,13 +77,14 @@ async def suspect_img(q:Q):
         q.client.suspect_img_path = local_path
         ic(local_path)
         q.page['content_left'].items[1].file_upload.label = '已上传'
-        ic(vars(q.page))
+        q.page['content_left'].items[4].button.disabled = False
     await q.page.save()
 
 @on()
 async def image_start_analysis(q:Q):
     suspect_img_path = q.client.suspect_img_path
     options = q.args['options']
+    q.page['content_left'].items[3].dropdown.values=options
     ic(suspect_img_path)
     ic(options)
     if suspect_img_path and options:
@@ -89,7 +95,7 @@ async def image_start_analysis(q:Q):
                 break
         if FLAG:
             q.page['meta'].dialog = ui.dialog(title='error', items=[
-                ui.text('对不起，暂不支持全部所选模型, 目前仅支持ZhuNet和YedNet!'),
+                ui.text('对不起，暂不支持全部所选模型'),
                 ui.buttons([ui.button(name='sure', label='确定', primary=True)])
             ])
         else:
@@ -101,13 +107,13 @@ async def image_start_analysis(q:Q):
                 
                 # load weights
                 if model_name == 'ZhuNet':
-                    model = model.load_from_checkpoint(str(root_dir / 'project/sa/zhunet/zhunet-epoch=210-val_loss=0.44-val_acc=0.85.ckpt'))
+                    model = model.load_from_checkpoint(str(root_dir / 'project/steganalysis/zhunet/zhunet-epoch=210-val_loss=0.44-val_acc=0.85.ckpt'))
                 elif model_name == 'YedNet':
-                    model = model.load_from_checkpoint(str(root_dir / 'project/sa/yednet/epoch=247-val_loss=0.48-val_acc=0.81.ckpt'))
+                    model = model.load_from_checkpoint(str(root_dir / 'project/steganalysis/yednet/epoch=247-val_loss=0.48-val_acc=0.81.ckpt'))
                 elif model_name == 'XuNet': # tf implemented currently
                     version = 'tf'
                     img = np.array(Image.open(suspect_img_path))
-                    model.load_weights(str(root_dir / 'project/sa/xunet/saved-model-117-0.85.hdf5'))
+                    model.load_weights(str(root_dir / 'project/steganalysis/xunet/saved-model-117-0.85.hdf5'))
                 elif model_name == 'SRNet':
                     pass
                 elif model_name == 'YeNet':
@@ -121,21 +127,37 @@ async def image_start_analysis(q:Q):
                 elif version == 'tf':
                     out = model(img).squeeze()
 
-                result[i] = out.tolist()
+                result[model_name] = out.tolist()
                 
             ic(result)
-            df = pd.DataFrame()
-            df['type'] = ['cover', 'stego']
-            df['prob'] = result[model_name]
-            q.page['content_right'] = ui.form_card(box=ui.box('content_right'), title='Outputs', items=[
-                ui.text(f"结果:{str(result)}"),
-                ui.visualization(ui.plot([ui.mark(type='interval', x='=type', y='=prob', x_title='类型', y_title='概率')]), data=data(fields=df.columns.tolist(), rows=df.values.tolist(), pack=True))
-            ])
+            # df = pd.DataFrame(result)
+            # df['type'] = ['cover', 'stego']
+            # df['prob'] = result[model_name]
+            # q.page['content_right'] = ui.form_card(box=ui.box('content_right'), title='Outputs', items=[
+            #     ui.text(f"结果:{str(result)}"),
+            #     ui.visualization(ui.plot([ui.mark(type='interval', x='=type', y='=prob', x_title='类型', y_title='概率')]), data=data(fields=df.columns.tolist(), rows=df.values.tolist(), pack=True))
+            # ])
+            fig = plot_group_bars(result)
+            fig.savefig('bar.png')
+            suspect_img_path2,  = await q.site.upload([suspect_img_path])
+            result_img_path,  = await q.site.upload(['bar.png'])
+            ic(result_img_path)
+            os.remove('bar.png')
+
+                
+            q.page['content_right'] = ui.markdown_card(box=ui.boxes(
+                ui.box('content_right', height='100%'),
+                ui.box('content_right', height='100%'),
+                ui.box('content_right', height='600px'),
+                ui.box('content_right', height='850px'),
+            ), title='Outputs',
+                content=f"**image:** {suspect_img_path.split('/')[-1]}\n\n ![plot]({suspect_img_path2})\n\n **result:**\n\n ![plot]({result_img_path})"
+            )
             q.page['content_left'].items[1].file_upload.label = '上传'
-            # del q.client.suspect_img_path
+            q.page['content_left'].items[4].button.disabled = True
     else:
         q.page['meta'].dialog = ui.dialog(title='error', items=[
-            ui.text('对不起，请检查是否输入完整!'),
+            ui.text('对不起，请上传图片!'),
             ui.buttons([ui.button(name='sure', label='确定', primary=True)])
         ])
     await q.page.save()
