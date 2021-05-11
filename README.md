@@ -4,6 +4,9 @@
 
 https://github.com/h2oai/wave/releases
 
+
+(使用教程:https://wave.h2o.ai/docs/getting-started)
+
 2. 解压并移动到home目录
 
 `tar -xzf wave-0.13.0-linux-amd64.tar.gz`
@@ -15,8 +18,11 @@ https://github.com/h2oai/wave/releases
 在`$HOME/wave`目录下执行`./waved`
 
 4. 运行app进程
+`git clone https://github.com/kevin2li/integrated_stega_paltform.git`
 
-在`$HOME/wave`目录下创建文件夹`myapps`，将仓库文件复制进`myapps`文件夹下，在`$HOME/wave/myapps/web`目录下执行`wave run index`即可
+`cd integrated_stega_paltform/web`
+
+`wave run index`
 
 # 效果展示
 ![](assets/image_steganalysis.png)
