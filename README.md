@@ -1,5 +1,5 @@
 # 集成隐写/分析平台
-# 安装教程
+# 安装教程(Linux)
 1. 下载SDK
 
 https://github.com/h2oai/wave/releases
@@ -17,3 +17,6 @@ https://github.com/h2oai/wave/releases
 4. 运行app进程
 
 在`$HOME/wave`目录下创建文件夹`myapps`，将仓库文件复制进`myapps`文件夹下，在`$HOME/wave/myapps/web`目录下执行`wave run index`即可
+
+# 效果展示
+![](assets/image_steganalysis.png)
