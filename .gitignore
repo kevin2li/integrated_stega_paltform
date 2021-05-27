@@ -3,5 +3,4 @@
 web/upload/*
 test*
 route.yml
-project/sa/xunet/0/
-project/sa/xunet/1/
+**/**/checkpoints

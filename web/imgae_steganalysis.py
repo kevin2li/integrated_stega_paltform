@@ -11,17 +11,19 @@ import sys
 sys.path.append(os.path.abspath('..'))
 from pathlib import Path
 
-import pandas as pd
+import matplotlib.pyplot as plt
 import numpy as np
+import pandas as pd
 import torch
 import torch.nn.functional as F
-from h2o_wave import Q, app, handle_on, main, on, ui, data
+from h2o_wave import Q, app, data, handle_on, main, on, ui
 from icecream import ic
-from project.steganalysis import YedNet, ZhuNet, XuNet
-from pathlib import Path
-import matplotlib.pyplot as plt
-from web.utils import *
 from project import root_dir
+from project.steganalysis.tf.models import XuNet
+from project.steganalysis.torch.models import YedNet, ZhuNet
+
+from web.utils import *
+
 
 #================================================================
 # 图像隐写分析
@@ -108,13 +110,13 @@ async def image_start_analysis(q:Q):
                     
                     # load weights
                     if model_name == 'ZhuNet':
-                        model = model.load_from_checkpoint(str(root_dir / 'project/steganalysis/zhunet/zhunet-epoch=210-val_loss=0.44-val_acc=0.85.ckpt'))
+                        model = model.load_from_checkpoint(str(root_dir / 'project/steganalysis/torch/checkpoints/zhunet/wow-epoch=210-val_loss=0.44-val_acc=0.85.ckpt'))
                     elif model_name == 'YedNet':
-                        model = model.load_from_checkpoint(str(root_dir / 'project/steganalysis/yednet/epoch=247-val_loss=0.48-val_acc=0.81.ckpt'))
+                        model = model.load_from_checkpoint(str(root_dir / 'project/steganalysis/torch/checkpoints/yednet/wow-epoch=247-val_loss=0.48-val_acc=0.81.ckpt'))
                     elif model_name == 'XuNet': # tf implemented currently
                         version = 'tf'
                         img = np.array(Image.open(suspect_img_path))
-                        model.load_weights(str(root_dir / 'project/steganalysis/xunet/saved-model-117-0.85.hdf5'))
+                        model.load_weights(str(root_dir / 'project/steganalysis/tf/checkpoints/xunet/saved-model-117-0.85.hdf5'))
                     elif model_name == 'SRNet':
                         pass
                     elif model_name == 'YeNet':
