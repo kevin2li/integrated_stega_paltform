@@ -4,3 +4,4 @@ web/upload/*
 test*
 route.yml
 **/**/checkpoints
+web/upload

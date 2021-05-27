@@ -1,0 +1,149 @@
+framework:
+  torch:
+    dataset:
+      wow:
+        embedding_rate:
+          0.4:
+            model:
+              zhunet: /home/likai/my_repos/integrated_stega_paltform/project/steganalysis/torch/checkpoints/zhunet/wow-epoch=210-val_loss=0.44-val_acc=0.85.ckpt
+              srnet: null
+              xunet: null
+              yenet: null
+              yednet: /home/likai/my_repos/integrated_stega_paltform/project/steganalysis/torch/checkpoints/yednet/wow-epoch=247-val_loss=0.48-val_acc=0.81.ckpt
+      suniward:
+        embedding_rate:
+          0.4:
+            model:
+              zhunet: /home/likai/my_repos/integrated_stega_paltform/project/steganalysis/torch/checkpoints/zhunet/suniward-epoch=235-val_loss=0.52-val_acc=0.76.ckpt
+              srnet: null
+              xunet: null
+              yenet: null
+              yednet: /home/likai/my_repos/integrated_stega_paltform/project/steganalysis/torch/checkpoints/yednet/suniward-epoch=262-val_loss=0.56-val_acc=0.72.ckpt
+      hill:
+        embedding_rate:
+          0.4:
+            model:
+              zhunet: /home/likai/my_repos/integrated_stega_paltform/project/steganalysis/torch/checkpoints/zhunet/hill-epoch=201-val_loss=0.51-val_acc=0.77.ckpt
+              srnet: null
+              xunet: null
+              yenet: null
+              yednet: /home/likai/my_repos/integrated_stega_paltform/project/steganalysis/torch/checkpoints/yednet/hill-epoch=258-val_loss=0.55-val_acc=0.73.ckpt
+      hugo:
+        embedding_rate:
+          0.4:
+            model:
+              zhunet: /home/likai/my_repos/integrated_stega_paltform/project/steganalysis/torch/checkpoints/zhunet/hugo-epoch=199-val_loss=0.49-val_acc=0.81.ckpt
+              srnet: null
+              xunet: null
+              yenet: null
+              yednet: /home/likai/my_repos/integrated_stega_paltform/project/steganalysis/torch/checkpoints/yednet/hugo-epoch=193-val_loss=0.50-val_acc=0.78.ckpt
+      mg:
+        embedding_rate:
+          0.4:
+            model:
+              zhunet: /home/likai/my_repos/integrated_stega_paltform/project/steganalysis/torch/checkpoints/zhunet/mg-epoch=168-val_loss=0.41-val_acc=0.89.ckpt
+              srnet: null
+              xunet: null
+              yenet: null
+              yednet: /home/likai/my_repos/integrated_stega_paltform/project/steganalysis/torch/checkpoints/yednet/mg-epoch=252-val_loss=0.43-val_acc=0.87.ckpt
+      mvg:
+        embedding_rate:
+          0.4:
+            model:
+              zhunet: /home/likai/my_repos/integrated_stega_paltform/project/steganalysis/torch/checkpoints/zhunet/mvg-epoch=165-val_loss=0.54-val_acc=0.74.ckpt
+              srnet: null
+              xunet: null
+              yenet: null
+              yednet: /home/likai/my_repos/integrated_stega_paltform/project/steganalysis/torch/checkpoints/yednet/mvg-epoch=277-val_loss=0.59-val_acc=0.69.ckpt
+      mipod:
+        embedding_rate:
+          0.4:
+            model:
+              zhunet: /home/likai/my_repos/integrated_stega_paltform/project/steganalysis/torch/checkpoints/zhunet/mipod-epoch=207-val_loss=0.53-val_acc=0.75.ckpt
+              srnet: null
+              xunet: null
+              yenet: null
+              yednet: /home/likai/my_repos/integrated_stega_paltform/project/steganalysis/torch/checkpoints/yednet/mipod-epoch=276-val_loss=0.56-val_acc=0.72.ckpt
+      utgan:
+        embedding_rate:
+          0.4:
+            model:
+              zhunet: /home/likai/my_repos/integrated_stega_paltform/project/steganalysis/torch/checkpoints/zhunet/utgan-epoch=296-val_loss=0.47-val_acc=0.83.ckpt
+              srnet: null
+              xunet: null
+              yenet: null
+              yednet: /home/likai/my_repos/integrated_stega_paltform/project/steganalysis/torch/checkpoints/yednet/utgan-epoch=188-val_loss=0.49-val_acc=0.81.ckpt
+  tf:
+    dataset:
+      wow:
+        embedding_rate:
+          0.4:
+            model:
+              zhunet: null
+              srnet: null
+              xunet: /home/likai/my_repos/integrated_stega_paltform/project/steganalysis/tf/checkpoints/xunet/saved-model-117-0.85.hdf5
+              yenet: null
+              yednet: null
+      suniward:
+        embedding_rate:
+          0.4:
+            model:
+              zhunet: null
+              srnet: null
+              xunet: null
+              yenet: null
+              yednet: null
+      hill:
+        embedding_rate:
+          0.4:
+            model:
+              zhunet: null
+              srnet: null
+              xunet: null
+              yenet: null
+              yednet: null
+      hugo:
+        embedding_rate:
+          0.4:
+            model:
+              zhunet: null
+              srnet: null
+              xunet: null
+              yenet: null
+              yednet: null
+      mg:
+        embedding_rate:
+          0.4:
+            model:
+              zhunet: null
+              srnet: null
+              xunet: null
+              yenet: null
+              yednet: null
+      mvg:
+        embedding_rate:
+          0.4:
+            model:
+              zhunet: null
+              srnet: null
+              xunet: null
+              yenet: null
+              yednet: null
+      mipod:
+        embedding_rate:
+          0.4:
+            model:
+              zhunet: null
+              srnet: null
+              xunet: null
+              yenet: null
+              yednet: null
+      utgan:
+        embedding_rate:
+          0.4:
+            model:
+              zhunet: null
+              srnet: null
+              xunet: null
+              yenet: null
+              yednet: null

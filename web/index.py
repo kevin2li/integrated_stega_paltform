@@ -32,11 +32,9 @@ first_level_help = {
 async def serve(q:Q):
     ic(q.args)
     # ic(vars(q.page['tab_bar'].tab_bar))
-    ic(q.client.initialized)
     if not q.client.initialized:
         await menu_index(q)
     location = q.args['#']
-    ic(location)
     if location:
         location = location.replace('/', '_')
         await eval(location)(q)
