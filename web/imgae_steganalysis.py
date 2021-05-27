@@ -99,36 +99,40 @@ async def image_start_analysis(q:Q):
                 ui.buttons([ui.button(name='sure', label='确定', primary=True)])
             ])
         else:
-            result = {}
-            for model_name in options:
-                version = 'torch'
-                img = img_preprocess(suspect_img_path)
-                model = eval(model_name)()
-                
-                # load weights
-                if model_name == 'ZhuNet':
-                    model = model.load_from_checkpoint(str(root_dir / 'project/steganalysis/zhunet/zhunet-epoch=210-val_loss=0.44-val_acc=0.85.ckpt'))
-                elif model_name == 'YedNet':
-                    model = model.load_from_checkpoint(str(root_dir / 'project/steganalysis/yednet/epoch=247-val_loss=0.48-val_acc=0.81.ckpt'))
-                elif model_name == 'XuNet': # tf implemented currently
-                    version = 'tf'
-                    img = np.array(Image.open(suspect_img_path))
-                    model.load_weights(str(root_dir / 'project/steganalysis/xunet/saved-model-117-0.85.hdf5'))
-                elif model_name == 'SRNet':
-                    pass
-                elif model_name == 'YeNet':
-                    pass
-                
-                # predict
-                if version == 'torch':
-                    model.eval()
-                    out = model(img)
-                    out = F.softmax(out, dim=-1).squeeze()
-                elif version == 'tf':
-                    out = model(img).squeeze()
+            def predict(suspect_img_path, options):
+                result = {}
+                for model_name in options:
+                    version = 'torch'
+                    img = img_preprocess(suspect_img_path)
+                    model = eval(model_name)()
+                    
+                    # load weights
+                    if model_name == 'ZhuNet':
+                        model = model.load_from_checkpoint(str(root_dir / 'project/steganalysis/zhunet/zhunet-epoch=210-val_loss=0.44-val_acc=0.85.ckpt'))
+                    elif model_name == 'YedNet':
+                        model = model.load_from_checkpoint(str(root_dir / 'project/steganalysis/yednet/epoch=247-val_loss=0.48-val_acc=0.81.ckpt'))
+                    elif model_name == 'XuNet': # tf implemented currently
+                        version = 'tf'
+                        img = np.array(Image.open(suspect_img_path))
+                        model.load_weights(str(root_dir / 'project/steganalysis/xunet/saved-model-117-0.85.hdf5'))
+                    elif model_name == 'SRNet':
+                        pass
+                    elif model_name == 'YeNet':
+                        pass
+                    
+                    # predict
+                    if version == 'torch':
+                        model.eval()
+                        out = model(img)
+                        out = F.softmax(out, dim=-1).squeeze()
+                    elif version == 'tf':
+                        out = model(img).squeeze()
 
-                result[model_name] = out.tolist()
-                
+                    result[model_name] = out.tolist()
+                return result
+            q.page['content_right'] = ui.form_card(box='content_right', title='Outputs', items=[ui.progress('Running...')])
+            await q.page.save()
+            result = await q.run(predict, suspect_img_path, options)
             ic(result)
             # df = pd.DataFrame(result)
             # df['type'] = ['cover', 'stego']
