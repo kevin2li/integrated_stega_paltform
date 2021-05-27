@@ -3,5 +3,6 @@
 web/upload/*
 test*
 route.yml
-**/**/checkpoints
+**/**/checkpoints/**/*pt
+**/**/checkpoints/**/*hdf5
 web/upload

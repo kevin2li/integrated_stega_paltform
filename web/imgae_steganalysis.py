@@ -112,11 +112,10 @@ async def image_start_analysis(q:Q):
             result = {}
             for model_name in models:
                 # read map.yml
-                path = '/home/likai/my_repos/integrated_stega_paltform/project/steganalysis/res/map.yml'
+                path = str(root_dir / 'project/steganalysis/res/map.yml')
                 with open(path) as f:
                     args = yaml.safe_load(f)
                 # get checkpoint_path
-                embedding_rate = 0.4
                 checkpoint_path = args['framework'][framework]['dataset'][dataset]['embedding_rate'][embedding_rate]['model'][model_name]
                 ic(checkpoint_path)
                 # load model and weights
